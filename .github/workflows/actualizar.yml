@@ -3,7 +3,7 @@ name: Recoleccion Diario de Cotizaciones
 on:
   schedule:
     - cron: '0 21 * * 1-5'  # De lunes a viernes a las 21:00 UTC (18:00 hora de Argentina)
-  workflow_dispatch:        # Permite ejecutarlo manualmente cuando quieras con el botón
+  workflow_dispatch:        # Permite ejecutarlo manualmente con el botón
 
 permissions:
   contents: write
@@ -29,7 +29,25 @@ jobs:
 
       - name: Ejecutar script recolector
         run: |
-          python coleccionista.py
+          echo "Buscando archivo de script Python..."
+          if [ -f "coleccionista.py" ]; then
+            python coleccionista.py
+          elif [ -f "recolector.py" ]; then
+            python recolector.py
+          elif [ -f "collector.py" ]; then
+            python collector.py
+          else
+            echo "Archivos en la carpeta:"
+            ls -la
+            SCRIPT=$(find . -maxdepth 1 -name "*.py" | head -n 1)
+            if [ -n "$SCRIPT" ]; then
+              echo "Ejecutando: $SCRIPT"
+              python "$SCRIPT"
+            else
+              echo "No se encontró ningún archivo .py en la raíz"
+              exit 1
+            fi
+          fi
 
       - name: Guardar y subir cambios
         run: |
