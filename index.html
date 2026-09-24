@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Plataforma Financiera & Control de Cartera</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Chart.js para kadagiti interactive graphs -->
+  <!-- Chart.js para gráficos interactivos -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <!-- Supabase official JS Client -->
+  <!-- SDK oficial de Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="bg-slate-950 text-slate-100 p-3 sm:p-6 font-sans min-h-screen">
@@ -17,7 +17,7 @@
     <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 w-full max-w-sm shadow-2xl space-y-4">
       <h2 id="auth-title" class="text-xl font-bold text-amber-400">Iniciar Sesión</h2>
       
-      <!-- Pagikabilan ti Email ken Password -->
+      <!-- Campos estándar: Correo y Contraseña -->
       <div id="auth-fields-standard" class="space-y-3">
         <div>
           <label class="block text-xs font-semibold text-slate-400 mb-1">Correo Electrónico</label>
@@ -29,18 +29,18 @@
         </div>
       </div>
 
-      <!-- Pagikabilan ti 6-digit Code (OTP) -->
+      <!-- Campo para Código OTP (6 dígitos) -->
       <div id="auth-fields-otp" class="hidden space-y-3">
-        <p class="text-xs text-slate-400">Nangipatulodkami iti code iti email-mo. Ikabil ditoy:</p>
+        <p class="text-xs text-slate-400">Hemos enviado un código a tu correo electrónico. Ingrésalo a continuación:</p>
         <div>
           <label class="block text-xs font-semibold text-slate-400 mb-1">Código de 6 dígitos</label>
           <input id="auth-otp-code" type="text" maxlength="6" class="w-full text-center tracking-widest font-mono text-lg bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-amber-400 focus:outline-none focus:border-amber-400" placeholder="123456">
         </div>
       </div>
 
-      <!-- Pagikabilan ti baro a password -->
+      <!-- Campo para definir nueva contraseña tras validación de código -->
       <div id="auth-fields-newpass" class="hidden space-y-3">
-        <p class="text-xs text-emerald-400">Napaneknekan ti code. Ikabil ti baro a password-mo:</p>
+        <p class="text-xs text-emerald-400">Código validado. Define tu nueva contraseña:</p>
         <div>
           <label class="block text-xs font-semibold text-slate-400 mb-1">Nueva Contraseña</label>
           <input id="auth-new-password" type="password" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-sm text-slate-100 focus:outline-none focus:border-amber-400" placeholder="••••••••">
@@ -49,12 +49,12 @@
 
       <div id="auth-msg" class="text-xs min-h-[1.2rem] text-rose-400 font-medium"></div>
 
-      <!-- Button ti aksion -->
+      <!-- Botón de acción principal -->
       <button id="btn-submit-auth" onclick="ejecutarAccionAuth()" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-2.5 rounded-lg text-sm transition-colors cursor-pointer">
         Ingresar
       </button>
 
-      <!-- Pagpilian nga alternatibo -->
+      <!-- Alternadores de vista -->
       <div class="space-y-1.5 text-center text-xs">
         <div>
           <button type="button" id="btn-toggle-modo" onclick="alternarModoRegistro()" class="text-slate-400 hover:text-amber-300 cursor-pointer">
@@ -175,7 +175,7 @@
       </div>
     </header>
 
-    <!-- Banner ti Alertas -->
+    <!-- Banner de Alertas Activas -->
     <div id="banner-alertas" class="hidden bg-amber-500/10 border border-amber-500/30 rounded-xl p-3">
       <div class="flex items-center gap-2 text-xs font-bold text-amber-400 mb-1">
         <span>⚡</span> Alertas Activas y Metas Cumplidas:
@@ -183,7 +183,7 @@
       <div id="lista-alertas-activas" class="text-xs space-y-1 text-slate-300 font-mono"></div>
     </div>
 
-    <!-- Tab Buttons -->
+    <!-- Navegación de Solapas -->
     <nav class="flex border-b border-slate-800 gap-2 overflow-x-auto">
       <button onclick="cambiarSolapa('mercado')" id="tab-btn-mercado" class="px-4 py-2.5 text-xs sm:text-sm font-bold border-b-2 border-amber-400 text-amber-400 transition-colors whitespace-nowrap cursor-pointer">
         1. Cotizaciones de Mercado
@@ -196,7 +196,7 @@
       </button>
     </nav>
 
-    <!-- SOLAPA 1: MERCADO -->
+    <!-- SOLAPA 1: MERCADO GENERAL -->
     <main id="solapa-mercado" class="space-y-6">
       <section class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div class="bg-slate-900 p-4 rounded-xl border border-sky-500/20 flex justify-between items-center">
@@ -225,7 +225,7 @@
       <div id="grid-sectores" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"></div>
     </main>
 
-    <!-- SOLAPA 2: HISTORIAL -->
+    <!-- SOLAPA 2: HISTORIAL CON CHART.JS -->
     <main id="solapa-historial" class="hidden space-y-4">
       <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
@@ -268,7 +268,7 @@
       </div>
     </main>
 
-    <!-- SOLAPA 3: PORTFOLIO -->
+    <!-- SOLAPA 3: MI PATRIMONIO -->
     <main id="solapa-portfolio" class="hidden space-y-6">
       <section class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 shadow flex flex-col justify-between">
@@ -314,7 +314,7 @@
         </div>
       </section>
 
-      <!-- Resumen Global & Donut Chart -->
+      <!-- Resumen Global & Gráfico Donut -->
       <section class="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div class="lg:col-span-2 bg-slate-900 rounded-xl p-4 border border-emerald-500/20 grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
           <div class="bg-slate-950 p-3 rounded-lg border border-slate-800">
@@ -342,7 +342,7 @@
         </div>
       </section>
 
-      <!-- Detalle ti Cartera -->
+      <!-- Detalle de Activos -->
       <section class="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden shadow">
         <div class="p-4 border-b border-slate-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
           <div>
@@ -362,23 +362,90 @@
   </div>
 
   <script>
-    // ==========================================
-    // 1. CONFIGURACION TI API (ISUKAT DITOY)
-    // ==========================================
-    const SUPABASE_URL = "https://sxrfyfawbttuvwuyjvct.supabase.co"; 
-    const SUPABASE_ANON_KEY = "sb_publishable_xjtgreMTwxjySCTk8eT8sA_RRDIxIVj"; 
-    const API_KEY = "224011768fed4370b5bb6e19de465c98"; 
-
+    // =========================================================
+    // 1. FUNCIONES DE INTERFAZ PRIMERO (A PRUEBA DE FALLOS)
+    // Se declaran al inicio para que los botones respondan SIEMPRE
+    // =========================================================
     var modoAuth = "login"; 
     var emailTemporal = "";
 
-    let supabase = null;
-    try {
-      if (window.supabase && SUPABASE_URL.startsWith("http")) {
-        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    function setAuthMsg(texto, esExito) {
+      var msg = document.getElementById("auth-msg");
+      if (!msg) return;
+      msg.textContent = texto || "";
+      msg.className = "text-xs min-h-[1.2rem] font-medium " + (esExito ? "text-emerald-400" : "text-rose-400");
+    }
+
+    function alternarModoRegistro() {
+      var title = document.getElementById("auth-title");
+      var btnSubmit = document.getElementById("btn-submit-auth");
+      var btnToggle = document.getElementById("btn-toggle-modo");
+      var btnOlvido = document.getElementById("btn-olvido-pass");
+      var passContainer = document.getElementById("auth-pass-container");
+
+      var fieldsStd = document.getElementById("auth-fields-standard");
+      var fieldsOtp = document.getElementById("auth-fields-otp");
+      var fieldsNewPass = document.getElementById("auth-fields-newpass");
+
+      if (fieldsStd) fieldsStd.classList.remove("hidden");
+      if (fieldsOtp) fieldsOtp.classList.add("hidden");
+      if (fieldsNewPass) fieldsNewPass.classList.add("hidden");
+      if (passContainer) passContainer.classList.remove("hidden");
+
+      if (modoAuth === "registro") {
+        modoAuth = "login";
+        if (title) title.textContent = "Iniciar Sesión";
+        if (btnSubmit) btnSubmit.textContent = "Ingresar";
+        if (btnToggle) btnToggle.textContent = "¿No tienes cuenta? Regístrate";
+        if (btnOlvido) btnOlvido.classList.remove("hidden");
+      } else {
+        modoAuth = "registro";
+        if (title) title.textContent = "Crear Cuenta";
+        if (btnSubmit) btnSubmit.textContent = "Registrarme";
+        if (btnToggle) btnToggle.textContent = "¿Ya tienes cuenta? Inicia sesión";
+        if (btnOlvido) btnOlvido.classList.add("hidden");
       }
-    } catch (e) {
-      console.warn("Supabase client initialized.");
+      setAuthMsg("");
+    }
+
+    function activarModoRecuperacion() {
+      modoAuth = "recuperar";
+      var title = document.getElementById("auth-title");
+      var btnSubmit = document.getElementById("btn-submit-auth");
+      var btnToggle = document.getElementById("btn-toggle-modo");
+      var btnOlvido = document.getElementById("btn-olvido-pass");
+      var passContainer = document.getElementById("auth-pass-container");
+
+      var fieldsStd = document.getElementById("auth-fields-standard");
+      var fieldsOtp = document.getElementById("auth-fields-otp");
+      var fieldsNewPass = document.getElementById("auth-fields-newpass");
+
+      if (passContainer) passContainer.classList.add("hidden");
+      if (fieldsStd) fieldsStd.classList.remove("hidden");
+      if (fieldsOtp) fieldsOtp.classList.add("hidden");
+      if (fieldsNewPass) fieldsNewPass.classList.add("hidden");
+
+      if (title) title.textContent = "Recuperar Contraseña";
+      if (btnSubmit) btnSubmit.textContent = "Enviar Código";
+      if (btnToggle) btnToggle.textContent = "Volver al inicio de sesión";
+      if (btnOlvido) btnOlvido.classList.add("hidden");
+      setAuthMsg("");
+    }
+
+    // =========================================================
+    // 2. CONFIGURACIÓN DE CREDENCIALES
+    // =========================================================
+    const SUPABASE_URL = "https://sxrfyfawbttuvwuyjvct.supabase.co"; // Ej: https://abcdef.supabase.co
+    const SUPABASE_ANON_KEY = "sb_publishable_xjtgreMTwxjySCTk8eT8sA_RRDIxIVj"; // Tu clave pública sb_publishable...
+    const API_KEY = "224011768fed4370b5bb6e19de465c98"; // Twelve Data
+
+    let supabase = null;
+    if (window.supabase && SUPABASE_URL && SUPABASE_URL.startsWith("http")) {
+      try {
+        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      } catch (err) {
+        console.warn("Aviso cliente Supabase:", err.message);
+      }
     }
 
     const LISTA_ACTIVOS = {
@@ -418,75 +485,12 @@
     let chartHistorialInstance = null;
     let chartPatrimonioInstance = null;
 
-    // ==========================================
-    // 2. SISTEMA TI AUTENTICACION
-    // ==========================================
-    function setAuthMsg(texto, esExito = false) {
-      const msg = document.getElementById("auth-msg");
-      if (!msg) return;
-      msg.textContent = texto;
-      msg.className = `text-xs min-h-[1.2rem] font-medium ${esExito ? 'text-emerald-400' : 'text-rose-400'}`;
-    }
-
-    function alternarModoRegistro() {
-      const title = document.getElementById("auth-title");
-      const btnSubmit = document.getElementById("btn-submit-auth");
-      const btnToggle = document.getElementById("btn-toggle-modo");
-      const btnOlvido = document.getElementById("btn-olvido-pass");
-      const passContainer = document.getElementById("auth-pass-container");
-
-      const fieldsStd = document.getElementById("auth-fields-standard");
-      const fieldsOtp = document.getElementById("auth-fields-otp");
-      const fieldsNewPass = document.getElementById("auth-fields-newpass");
-
-      if (fieldsStd) fieldsStd.classList.remove("hidden");
-      if (fieldsOtp) fieldsOtp.classList.add("hidden");
-      if (fieldsNewPass) fieldsNewPass.classList.add("hidden");
-      if (passContainer) passContainer.classList.remove("hidden");
-
-      if (modoAuth === "registro") {
-        modoAuth = "login";
-        if (title) title.textContent = "Iniciar Sesión";
-        if (btnSubmit) btnSubmit.textContent = "Ingresar";
-        if (btnToggle) btnToggle.textContent = "¿No tienes cuenta? Regístrate";
-        if (btnOlvido) btnOlvido.classList.remove("hidden");
-      } else {
-        modoAuth = "registro";
-        if (title) title.textContent = "Crear Cuenta";
-        if (btnSubmit) btnSubmit.textContent = "Registrarme";
-        if (btnToggle) btnToggle.textContent = "¿Ya tienes cuenta? Inicia sesión";
-        if (btnOlvido) btnOlvido.classList.add("hidden");
-      }
-      setAuthMsg("");
-    }
-
-    function activarModoRecuperacion() {
-      modoAuth = "recuperar";
-      const title = document.getElementById("auth-title");
-      const btnSubmit = document.getElementById("btn-submit-auth");
-      const btnToggle = document.getElementById("btn-toggle-modo");
-      const btnOlvido = document.getElementById("btn-olvido-pass");
-      const passContainer = document.getElementById("auth-pass-container");
-
-      const fieldsStd = document.getElementById("auth-fields-standard");
-      const fieldsOtp = document.getElementById("auth-fields-otp");
-      const fieldsNewPass = document.getElementById("auth-fields-newpass");
-
-      if (passContainer) passContainer.classList.add("hidden");
-      if (fieldsStd) fieldsStd.classList.remove("hidden");
-      if (fieldsOtp) fieldsOtp.classList.add("hidden");
-      if (fieldsNewPass) fieldsNewPass.classList.add("hidden");
-
-      if (title) title.textContent = "Recuperar Contraseña";
-      if (btnSubmit) btnSubmit.textContent = "Enviar Código de Recuperación";
-      if (btnToggle) btnToggle.textContent = "Volver al inicio de sesión";
-      if (btnOlvido) btnOlvido.classList.add("hidden");
-      setAuthMsg("");
-    }
-
+    // =========================================================
+    // 3. ACCIONES DE AUTENTICACIÓN
+    // =========================================================
     async function ejecutarAccionAuth() {
       if (!supabase) {
-        setAuthMsg("Masapul nga ikabil ti husto a SUPABASE_URL ken SUPABASE_ANON_KEY iti script.");
+        setAuthMsg("Revisa que SUPABASE_URL y SUPABASE_ANON_KEY estén configuradas.");
         return;
       }
 
@@ -517,7 +521,7 @@
           document.getElementById("auth-fields-standard").classList.add("hidden");
           document.getElementById("auth-fields-otp").classList.remove("hidden");
           document.getElementById("btn-submit-auth").textContent = "Confirmar Código";
-          setAuthMsg("Código naipatulod iti " + email, true);
+          setAuthMsg("Código de verificación enviado a tu email", true);
         }
         else if (modoAuth === "otp_registro") {
           if (otp.length < 6) return setAuthMsg("Ingresa el código de 6 dígitos.");
@@ -536,7 +540,7 @@
           document.getElementById("auth-fields-standard").classList.add("hidden");
           document.getElementById("auth-fields-otp").classList.remove("hidden");
           document.getElementById("btn-submit-auth").textContent = "Verificar Código";
-          setAuthMsg("Código naipatulod iti " + email, true);
+          setAuthMsg("Código enviado a " + email, true);
         }
         else if (modoAuth === "otp_recuperar") {
           if (otp.length < 6) return setAuthMsg("Ingresa el código de 6 dígitos.");
@@ -557,7 +561,7 @@
           await cargarSesion(data.user);
         }
       } catch (err) {
-        setAuthMsg(err.message || "Error ti panagproseso.");
+        setAuthMsg(err.message || "Error al procesar la solicitud.");
       }
     }
 
@@ -565,7 +569,6 @@
       usuarioActual = user;
       document.getElementById("auth-modal").classList.add("hidden");
       document.getElementById("user-badge").textContent = user.email.split('@')[0];
-
       await cargarDatosDesdeNube();
       inicializarApp();
     }
@@ -575,9 +578,9 @@
       location.reload();
     }
 
-    // ==========================================
-    // 3. DATABASE SYNC (SUPABASE)
-    // ==========================================
+    // =========================================================
+    // 4. PERSISTENCIA EN NUBE
+    // =========================================================
     async function cargarDatosDesdeNube() {
       if (!usuarioActual || !supabase) return;
       try {
@@ -605,7 +608,7 @@
           }]);
         }
       } catch (e) {
-        console.warn("Perfil cargado.");
+        console.warn("Aviso al cargar perfil:", e);
       }
     }
 
@@ -627,9 +630,9 @@
       }
     }
 
-    // ==========================================
-    // 4. PANAGPINDIREN DAGITI TAB KEN TRANSAKSION
-    // ==========================================
+    // =========================================================
+    // 5. NAVEGACIÓN Y MERCADO
+    // =========================================================
     function cambiarSolapa(solapa) {
       document.getElementById("solapa-mercado").classList.add("hidden");
       document.getElementById("solapa-historial").classList.add("hidden");
@@ -673,13 +676,13 @@
           if (data.compras || data.tenencias_ars) {
             perfilDatos = data;
             await sincronizarNube();
-            alert("Respaldo naipasubli a sibaballigi.");
+            alert("Respaldo restaurado correctamente.");
             renderizarPortfolioDetallado();
             renderizarTenenciasARS();
             actualizarPanelPortfolio();
           }
         } catch (err) {
-          alert("Error: Saan a mabalin daytoy a file.");
+          alert("Error: Archivo no compatible.");
         }
       };
       reader.readAsText(file);
@@ -767,13 +770,11 @@
       `;
     }
 
-    // --- FAVORITOS ---
     async function toggleFavorito(ticker) {
       let favs = perfilDatos.favoritos || [];
       favs = favs.includes(ticker) ? favs.filter(t => t !== ticker) : [...favs, ticker];
       perfilDatos.favoritos = favs;
       await sincronizarNube();
-
       renderizarFavoritos();
       construirInterfazMercado();
     }
@@ -791,7 +792,6 @@
       grid.innerHTML = "";
 
       const todos = Object.values(LISTA_ACTIVOS).flat();
-
       favs.forEach(ticker => {
         const info = todos.find(a => a.ticker === ticker) || { nombre: ticker, ticker };
         const precioCache = localStorage.getItem(`cache_${ticker}`);
@@ -849,7 +849,6 @@
       }
     }
 
-    // --- HISTORIAL CHART.JS ---
     function poblarSelectores() {
       const selectHist = document.getElementById("select-historial-ticker");
       const selectAgreg = document.getElementById("select-agregar-activo");
@@ -963,7 +962,6 @@
       });
     }
 
-    // --- ALERTAS ---
     function abrirModalAlerta(ticker) {
       document.getElementById("alerta-ticker").value = ticker;
       document.getElementById("modal-alerta-titulo").textContent = `Meta: ${ticker}`;
@@ -1014,7 +1012,7 @@
           if (cumplida) {
             activas++;
             const item = document.createElement("div");
-            item.innerHTML = `🎯 <strong>${ticker}</strong> cotiza a $${precioActual.toFixed(2)} USD (Meta: ${config.condicion === 'mayor' ? '≥' : '≤'} $${config.precio.toFixed(2)})`;
+            item.innerHTML = `🎯 <strong>${ticker}</strong> cotiza a $${precioActual.toFixed(2)} USD (Meta alcanzada: ${config.condicion === 'mayor' ? '≥' : '≤'} $${config.precio.toFixed(2)})`;
             lista.appendChild(item);
           }
         }
@@ -1024,7 +1022,6 @@
       else banner.classList.add("hidden");
     }
 
-    // --- PORTFOLIO & TENENCIAS ---
     function abrirModalTenenciaARS(tipo, titulo) {
       document.getElementById("tenencia-ars-tipo").value = tipo;
       document.getElementById("modal-tenencia-titulo").textContent = `Ajustar ${titulo}`;
@@ -1291,7 +1288,7 @@
       });
     }
 
-    // --- ROTACION ITI PRESYO (LIVE CLIENT) ---
+    // --- ROTACIÓN DE PRECIOS EN VIVO (CLIENTE) ---
     let lotes = [];
     let indiceLote = 0;
     let tiempoRestante = 60;
@@ -1365,11 +1362,10 @@
             await cargarSesion(session.user);
           }
         } catch (e) {
-          console.warn("Awan pay ti aktibo a sesyon.");
+          console.warn("Sin sesión previa activa.");
         }
       }
     });
   </script>
 </body>
 </html>
-
