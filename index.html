@@ -54,16 +54,15 @@
         Ingresar
       </button>
 
-      <!-- Alternadores de vista -->
+      <!-- Alternadores de vista con funciones directas -->
       <div class="space-y-1.5 text-center text-xs">
         <div>
-          <button type="button" id="btn-toggle-modo" onclick="alert('Botón tocado')" class="text-slate-400 hover:text-amber-300 cursor-pointer">
-  ¿No tienes cuenta? Regístrate
-</button>
-
+          <button type="button" id="btn-toggle-modo" onclick="cambiarVistaRegistro()" class="text-slate-400 hover:text-amber-300 py-1 px-2 cursor-pointer font-semibold">
+            ¿No tienes cuenta? Regístrate
+          </button>
         </div>
         <div>
-          <button type="button" id="btn-olvido-pass" onclick="activarModoRecuperacion()" class="text-slate-500 hover:text-rose-400 text-[11px] underline cursor-pointer">
+          <button type="button" id="btn-olvido-pass" onclick="cambiarVistaRecuperar()" class="text-slate-500 hover:text-rose-400 text-[11px] underline py-1 px-2 cursor-pointer">
             ¿Olvidaste tu contraseña?
           </button>
         </div>
@@ -364,8 +363,7 @@
 
   <script>
     // =========================================================
-    // 1. FUNCIONES DE INTERFAZ PRIMERO (A PRUEBA DE FALLOS)
-    // Se declaran al inicio para que los botones respondan SIEMPRE
+    // 1. FUNCIONES DE CAMBIO DE PANTALLA DIRECTAS (SIN BLOQUEOS)
     // =========================================================
     var modoAuth = "login"; 
     var emailTemporal = "";
@@ -377,59 +375,47 @@
       msg.className = "text-xs min-h-[1.2rem] font-medium " + (esExito ? "text-emerald-400" : "text-rose-400");
     }
 
-    function alternarModoRegistro() {
-      var title = document.getElementById("auth-title");
+    function cambiarVistaRegistro() {
+      var titulo = document.getElementById("auth-title");
       var btnSubmit = document.getElementById("btn-submit-auth");
       var btnToggle = document.getElementById("btn-toggle-modo");
       var btnOlvido = document.getElementById("btn-olvido-pass");
       var passContainer = document.getElementById("auth-pass-container");
-
-      var fieldsStd = document.getElementById("auth-fields-standard");
-      var fieldsOtp = document.getElementById("auth-fields-otp");
-      var fieldsNewPass = document.getElementById("auth-fields-newpass");
-
-      if (fieldsStd) fieldsStd.classList.remove("hidden");
-      if (fieldsOtp) fieldsOtp.classList.add("hidden");
-      if (fieldsNewPass) fieldsNewPass.classList.add("hidden");
-      if (passContainer) passContainer.classList.remove("hidden");
 
       if (modoAuth === "registro") {
         modoAuth = "login";
-        if (title) title.textContent = "Iniciar Sesión";
-        if (btnSubmit) btnSubmit.textContent = "Ingresar";
-        if (btnToggle) btnToggle.textContent = "¿No tienes cuenta? Regístrate";
-        if (btnOlvido) btnOlvido.classList.remove("hidden");
+        titulo.textContent = "Iniciar Sesión";
+        btnSubmit.textContent = "Ingresar";
+        btnToggle.textContent = "¿No tienes cuenta? Regístrate";
+        btnOlvido.style.display = "inline-block";
       } else {
         modoAuth = "registro";
-        if (title) title.textContent = "Crear Cuenta";
-        if (btnSubmit) btnSubmit.textContent = "Registrarme";
-        if (btnToggle) btnToggle.textContent = "¿Ya tienes cuenta? Inicia sesión";
-        if (btnOlvido) btnOlvido.classList.add("hidden");
+        titulo.textContent = "Crear Cuenta";
+        btnSubmit.textContent = "Registrarme";
+        btnToggle.textContent = "¿Ya tienes cuenta? Inicia sesión";
+        btnOlvido.style.display = "none";
       }
+
+      if (passContainer) passContainer.style.display = "block";
+      document.getElementById("auth-fields-standard").classList.remove("hidden");
+      document.getElementById("auth-fields-otp").classList.add("hidden");
+      document.getElementById("auth-fields-newpass").classList.add("hidden");
       setAuthMsg("");
     }
 
-    function activarModoRecuperacion() {
+    function cambiarVistaRecuperar() {
       modoAuth = "recuperar";
-      var title = document.getElementById("auth-title");
-      var btnSubmit = document.getElementById("btn-submit-auth");
-      var btnToggle = document.getElementById("btn-toggle-modo");
-      var btnOlvido = document.getElementById("btn-olvido-pass");
+      document.getElementById("auth-title").textContent = "Recuperar Contraseña";
+      document.getElementById("btn-submit-auth").textContent = "Enviar Código";
+      document.getElementById("btn-toggle-modo").textContent = "Volver al inicio de sesión";
+      document.getElementById("btn-olvido-pass").style.display = "none";
+
       var passContainer = document.getElementById("auth-pass-container");
+      if (passContainer) passContainer.style.display = "none";
 
-      var fieldsStd = document.getElementById("auth-fields-standard");
-      var fieldsOtp = document.getElementById("auth-fields-otp");
-      var fieldsNewPass = document.getElementById("auth-fields-newpass");
-
-      if (passContainer) passContainer.classList.add("hidden");
-      if (fieldsStd) fieldsStd.classList.remove("hidden");
-      if (fieldsOtp) fieldsOtp.classList.add("hidden");
-      if (fieldsNewPass) fieldsNewPass.classList.add("hidden");
-
-      if (title) title.textContent = "Recuperar Contraseña";
-      if (btnSubmit) btnSubmit.textContent = "Enviar Código";
-      if (btnToggle) btnToggle.textContent = "Volver al inicio de sesión";
-      if (btnOlvido) btnOlvido.classList.add("hidden");
+      document.getElementById("auth-fields-standard").classList.remove("hidden");
+      document.getElementById("auth-fields-otp").classList.add("hidden");
+      document.getElementById("auth-fields-newpass").classList.add("hidden");
       setAuthMsg("");
     }
 
@@ -1289,7 +1275,6 @@
       });
     }
 
-    // --- ROTACIÓN DE PRECIOS EN VIVO (CLIENTE) ---
     let lotes = [];
     let indiceLote = 0;
     let tiempoRestante = 60;
