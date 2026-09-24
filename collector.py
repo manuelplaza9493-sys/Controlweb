@@ -6,33 +6,34 @@ import requests
 
 API_KEY = os.getenv("TWELVE_DATA_API_KEY", "224011768fed4370b5bb6e19de465c98")
 
-# LISTA COMPLETA DE 80 ACTIVOS (COINCIDE EXACTAMENTE CON LA WEB)
+# LISTA COMPLETA DE 80 ACTIVOS (100% COMPATIBLES CON TWELVE DATA)
 ACTIVOS = [
-    # Commodities, Cripto & Monedas (10)
-    "BTC/USD", "ETH/USD", "SOL/USD", "PAXG/USD", "USO", "BNO", "SLV", "EUR/USD", "USD/ARS", "XAU/USD",
+    # Commodities, Cripto & Divisas (10)
+    "BTC/USD", "ETH/USD", "SOL/USD", "PAXG/USD", "USO", "BNO", "SLV", "EUR/USD", "USD/ARS", "GLD",
     
-    # Argentina Top 20 (ADRs Wall Street)
-    "GGAL", "BMA", "YPF", "PAM", "MELI", "GLOB", "VIST", "TX", "CRES", "EDN",
-    "TGS", "BBAR", "TEO", "CEPU", "IRS", "SUPV", "BIOX", "LOMA", "DESP", "CAAP",
+    # Argentina Top 20 (ADRs Wall Street) (20)
+    "GGAL", "BMA", "YPF", "PAM", "MELI", "GLOB", "VIST", "TX", "AGRO", "EDN",
+    "TGS", "BBAR", "TEO", "CEPU", "IRS", "SUPV", "BIOX", "LOMA", "TS", "CAAP",
     
-    # Tecnología Top 10
+    # Tecnología Top 10 (10)
     "AAPL", "MSFT", "GOOGL", "AMZN", "META", "TSLA", "NFLX", "ADBE", "CRM", "ORCL",
     
-    # IA & Semiconductores Top 10
+    # IA & Semiconductores Top 10 (10)
     "NVDA", "AMD", "TSM", "AVGO", "ASML", "QCOM", "INTC", "ARM", "PLTR", "MU",
     
-    # Minería & Litio Top 10
-    "BHP", "RIO", "VALE", "FCX", "ALB", "SCCO", "NEM", "GOLD", "SQM", "ALTM",
+    # Minería & Metales Top 10 (10)
+    "BHP", "RIO", "VALE", "FCX", "ALB", "SCCO", "NEM", "GOLD", "SQM", "TECK",
     
-    # Real Estate Top 10
+    # Real Estate Top 10 (10)
     "PLD", "AMT", "EQIX", "PSA", "O", "SPG", "WELL", "DLR", "CCI", "CBRE",
     
-    # Alimentos & Consumo Top 10
+    # Alimentos & Consumo Top 10 (10)
     "KO", "PEP", "PG", "MDLZ", "PM", "MO", "CL", "KMB", "HSY", "GIS",
     
-    # Automotriz Top 10
-    "TM", "F", "GM", "STLA", "HMC", "RACE", "MBGYY", "VWAGY", "RIVN"
+    # Automotriz Top 10 (10)
+    "TM", "F", "GM", "STLA", "HMC", "RACE", "MBGYY", "VWAGY", "RIVN", "NIO"
 ]
+
 
 def cargar_json(nombre_archivo, default):
     if os.path.exists(nombre_archivo):
