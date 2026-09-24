@@ -427,38 +427,119 @@
     // =========================================================
     // 1. CONFIGURACIÓN DE CREDENCIALES
     // =========================================================
-    const SUPABASE_URL = "https://sxrfyfawbttuvwuyjvct.supabase.co"; // Ej: https://abcdef.supabase.co
-    const SUPABASE_ANON_KEY = "sb_publishable_xjtgreMTwxjySCTk8eT8sA_RRDIxIVj"; // Tu clave pública sb_publishable_...
+    const SUPABASE_URL = "TU_SUPABASE_URL_AQUI"; // Tu Project URL
+    const SUPABASE_ANON_KEY = "TU_SUPABASE_ANON_KEY_AQUI"; // Tu clave pública sb_publishable_...
     const API_KEY = "224011768fed4370b5bb6e19de465c98"; // Twelve Data
 
-    const LISTA_ACTIVOS = {
-      "Monedas & Cripto": [
-        { ticker: "USD/ARS", nombre: "Dólar Oficial" },
-        { ticker: "EUR/USD", nombre: "Euro" },
+    // ESTRUCTURA COMPLETA DE ACTIVOS POR SECTOR
+        const LISTA_ACTIVOS = {
+      "Commodities, Cripto & Divisas": [
         { ticker: "BTC/USD", nombre: "Bitcoin" },
         { ticker: "ETH/USD", nombre: "Ethereum" },
-        { ticker: "SOL/USD", nombre: "Solana" }
+        { ticker: "SOL/USD", nombre: "Solana" },
+        { ticker: "PAXG/USD", nombre: "Oro Onza (PAXG Físico)" },
+        { ticker: "USO", nombre: "Petróleo Crudo WTI (ETF)" },
+        { ticker: "BNO", nombre: "Petróleo Brent (ETF)" },
+        { ticker: "SLV", nombre: "Plata Física (ETF iShares)" },
+        { ticker: "EUR/USD", nombre: "Euro / Dólar" },
+        { ticker: "USD/ARS", nombre: "Dólar Oficial" }
       ],
-      "Argentina (ADRs EE.UU.)": [
-        { ticker: "GGAL", nombre: "Grupo Fin. Galicia" },
+      "Argentina Top 20 (ADRs Wall Street)": [
+        { ticker: "GGAL", nombre: "Grupo Financiero Galicia" },
         { ticker: "BMA", nombre: "Banco Macro" },
-        { ticker: "YPF", nombre: "YPF" },
+        { ticker: "YPF", nombre: "YPF S.A." },
         { ticker: "PAM", nombre: "Pampa Energía" },
         { ticker: "MELI", nombre: "Mercado Libre" },
         { ticker: "GLOB", nombre: "Globant" },
         { ticker: "VIST", nombre: "Vista Energy" },
-        { ticker: "TX", nombre: "Ternium" }
+        { ticker: "TX", nombre: "Ternium" },
+        { ticker: "CRES", nombre: "Cresud" },
+        { ticker: "EDN", nombre: "Edenor" },
+        { ticker: "TGS", nombre: "Transp. Gas del Sur" },
+        { ticker: "BBAR", nombre: "BBVA Argentina" },
+        { ticker: "TEO", nombre: "Telecom Argentina (ADR)" },
+        { ticker: "CEPU", nombre: "Central Puerto" },
+        { ticker: "IRS", nombre: "IRSA Inversiones" },
+        { ticker: "SUPV", nombre: "Grupo Supervielle" },
+        { ticker: "BIOX", nombre: "Bioceres Crop Solutions" },
+        { ticker: "LOMA", nombre: "Loma Negra" },
+        { ticker: "DESP", nombre: "Despegar.com" },
+        { ticker: "CAAP", nombre: "Corp. América Airports" }
       ],
-      "Sector Tecnología & IA": [
-        { ticker: "AAPL", nombre: "Apple" },
+      "Tecnología Top 10": [
+        { ticker: "AAPL", nombre: "Apple Inc." },
         { ticker: "MSFT", nombre: "Microsoft" },
-        { ticker: "NVDA", nombre: "NVIDIA" },
-        { ticker: "GOOGL", nombre: "Alphabet" },
+        { ticker: "GOOGL", nombre: "Alphabet (Google)" },
         { ticker: "AMZN", nombre: "Amazon" },
+        { ticker: "META", nombre: "Meta Platforms" },
+        { ticker: "TSLA", nombre: "Tesla Inc." },
+        { ticker: "NFLX", nombre: "Netflix" },
+        { ticker: "ADBE", nombre: "Adobe" },
+        { ticker: "CRM", nombre: "Salesforce" },
+        { ticker: "ORCL", nombre: "Oracle" }
+      ],
+      "IA & Semiconductores Top 10": [
+        { ticker: "NVDA", nombre: "NVIDIA" },
+        { ticker: "AMD", nombre: "Advanced Micro Devices" },
+        { ticker: "TSM", nombre: "Taiwan Semiconductor (TSMC)" },
+        { ticker: "AVGO", nombre: "Broadcom" },
+        { ticker: "ASML", nombre: "ASML Holding" },
+        { ticker: "QCOM", nombre: "Qualcomm" },
+        { ticker: "INTC", nombre: "Intel" },
+        { ticker: "ARM", nombre: "Arm Holdings" },
+        { ticker: "PLTR", nombre: "Palantir Technologies" },
+        { ticker: "MU", nombre: "Micron Technology" }
+      ],
+      "Minería & Litio Top 10": [
+        { ticker: "BHP", nombre: "BHP Group" },
+        { ticker: "RIO", nombre: "Rio Tinto" },
+        { ticker: "VALE", nombre: "Vale S.A." },
+        { ticker: "FCX", nombre: "Freeport-McMoRan (Cobre)" },
+        { ticker: "ALB", nombre: "Albemarle (Litio)" },
+        { ticker: "SCCO", nombre: "Southern Copper" },
+        { ticker: "NEM", nombre: "Newmont (Oro)" },
+        { ticker: "GOLD", nombre: "Barrick Gold" },
+        { ticker: "SQM", nombre: "Soc. Química y Minera Chile" },
+        { ticker: "ALTM", nombre: "Arcadium Lithium" }
+      ],
+      "Real Estate / Bienes Raíces Top 10": [
+        { ticker: "PLD", nombre: "Prologis" },
+        { ticker: "AMT", nombre: "American Tower" },
+        { ticker: "EQIX", nombre: "Equinix" },
+        { ticker: "PSA", nombre: "Public Storage" },
+        { ticker: "O", nombre: "Realty Income" },
+        { ticker: "SPG", nombre: "Simon Property Group" },
+        { ticker: "WELL", nombre: "Welltower" },
+        { ticker: "DLR", nombre: "Digital Realty" },
+        { ticker: "CCI", nombre: "Crown Castle" },
+        { ticker: "CBRE", nombre: "CBRE Group" }
+      ],
+      "Alimentos & Consumo Top 10": [
+        { ticker: "KO", nombre: "Coca-Cola" },
+        { ticker: "PEP", nombre: "PepsiCo" },
+        { ticker: "PG", nombre: "Procter & Gamble" },
+        { ticker: "MDLZ", nombre: "Mondelez" },
+        { ticker: "PM", nombre: "Philip Morris" },
+        { ticker: "MO", nombre: "Altria Group" },
+        { ticker: "CL", nombre: "Colgate-Palmolive" },
+        { ticker: "KMB", nombre: "Kimberly-Clark" },
+        { ticker: "HSY", nombre: "The Hershey Co." },
+        { ticker: "GIS", nombre: "General Mills" }
+      ],
+      "Sector Automotriz Top 10": [
         { ticker: "TSLA", nombre: "Tesla" },
-        { ticker: "PLTR", nombre: "Palantir" }
+        { ticker: "TM", nombre: "Toyota Motor" },
+        { ticker: "F", nombre: "Ford" },
+        { ticker: "GM", nombre: "General Motors" },
+        { ticker: "STLA", nombre: "Stellantis" },
+        { ticker: "HMC", nombre: "Honda Motor" },
+        { ticker: "RACE", nombre: "Ferrari" },
+        { ticker: "MBGYY", nombre: "Mercedes-Benz Group" },
+        { ticker: "VWAGY", nombre: "Volkswagen Group" },
+        { ticker: "RIVN", nombre: "Rivian" }
       ]
     };
+
 
     let cacheHistorialJSON = {};
     let precioDolarRef = 1200;
@@ -608,7 +689,7 @@
     }
 
     // =========================================================
-    // 3. PERSISTENCIA EN NUBE
+    // 3. PERSISTENCIA EN SUPABASE CON REST API NATIVA
     // =========================================================
     async function cargarDatosDesdeNube() {
       if (!usuarioActual) return;
@@ -729,21 +810,27 @@
       reader.readAsText(file);
     }
 
+    // PRECARGA INTELIGENTE DE DATOS SIN CACHÉ
     async function precargarDatosArchivados() {
+      const antiCache = `?t=${Date.now()}`;
       try {
-        const resP = await fetch("precios.json", { cache: "no-store" });
+        const resP = await fetch("precios.json" + antiCache, { cache: "no-store" });
         if (resP.ok) {
           const precios = await resP.json();
           for (const [t, p] of Object.entries(precios)) {
             localStorage.setItem(`cache_${t}`, p);
           }
         }
-      } catch (e) {}
+      } catch (e) {
+        console.warn("precios.json aún no generado o no accesible.");
+      }
 
       try {
-        const resH = await fetch("historial.json", { cache: "no-store" });
+        const resH = await fetch("historial.json" + antiCache, { cache: "no-store" });
         if (resH.ok) cacheHistorialJSON = await resH.json();
-      } catch (e) {}
+      } catch (e) {
+        console.warn("historial.json aún no generado o no accesible.");
+      }
     }
 
     async function actualizarReferenciasLocales() {
@@ -1329,6 +1416,7 @@
       });
     }
 
+    // ROTACIÓN DE LOTES DE 8 ACTIVOS (Respeta límite de Twelve Data)
     let lotes = [];
     let indiceLote = 0;
     let tiempoRestante = 60;
@@ -1400,7 +1488,6 @@
     window.addEventListener("DOMContentLoaded", async () => {
       const urlBase = SUPABASE_URL.trim().replace(/\/+$/, "");
 
-      // 1. Detectar si el usuario viene de hacer clic en el enlace del email
       const hash = window.location.hash.substring(1);
       const params = new URLSearchParams(hash);
       const accessToken = params.get("access_token");
@@ -1408,7 +1495,6 @@
 
       if (accessToken) {
         localStorage.setItem("sb_token", accessToken);
-        // Limpiar la URL en la barra del navegador
         window.history.replaceState(null, null, window.location.pathname);
 
         if (tipo === "recovery") {
@@ -1420,7 +1506,6 @@
           return;
         }
 
-        // Si fue confirmación de registro (signup), autenticamos de inmediato
         try {
           const res = await fetch(`${urlBase}/auth/v1/user`, {
             method: "GET",
@@ -1434,7 +1519,6 @@
         } catch (e) {}
       }
 
-      // 2. Si ya tenía sesión iniciada previamente
       const tokenGuardado = localStorage.getItem("sb_token");
       if (tokenGuardado && SUPABASE_URL && !SUPABASE_URL.includes("TU_SUPABASE_URL")) {
         try {
