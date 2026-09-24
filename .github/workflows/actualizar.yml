@@ -2,8 +2,8 @@ name: Recoleccion Diario de Cotizaciones
 
 on:
   schedule:
-    - cron: '0 21 * * 1-5'
-  workflow_dispatch:
+    - cron: '0 21 * * 1-5'  # De lunes a viernes a las 21:00 UTC (18:00 hora de Argentina)
+  workflow_dispatch:        # Permite ejecutarlo manualmente cuando quieras con el botón
 
 permissions:
   contents: write
@@ -13,8 +13,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout del repositorio
+      - name: Descargar repositorio
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Configurar Python
         uses: actions/setup-python@v5
@@ -25,18 +27,15 @@ jobs:
         run: |
           pip install requests
 
-      - name: Ejecutar script de recoleccion
+      - name: Ejecutar script recolector
         run: |
           python coleccionista.py
 
-        - name: Guardar y subir cambios
+      - name: Guardar y subir cambios
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git status
           git add -f precios.json historial.json
-          git commit -m "Actualizar cotizaciones [skip ci]" || echo "Sin cambios nuevos"
+          git commit -m "Actualizar cotizaciones [skip ci]" || echo "Sin cambios nuevos para commitear"
           git push origin HEAD:${{ github.ref_name }}
-
-
-      
