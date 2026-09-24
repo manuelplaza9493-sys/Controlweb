@@ -29,10 +29,14 @@ jobs:
         run: |
           python coleccionista.py
 
-      - name: Guardar y subir cambios
+        - name: Guardar y subir cambios
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add precios.json historial.json
-          git commit -m "Actualizar cotizaciones [skip ci]" || echo "No hay cambios para commitear"
-          git push
+          git status
+          git add -f precios.json historial.json
+          git commit -m "Actualizar cotizaciones [skip ci]" || echo "Sin cambios nuevos"
+          git push origin HEAD:${{ github.ref_name }}
+
+
+      
