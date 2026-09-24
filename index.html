@@ -422,15 +422,21 @@
     const API_KEY = "224011768fed4370b5bb6e19de465c98"; // Twelve Data
 
     let supabase = null;
-    function iniciarSupabase() {
-      if (window.supabase && SUPABASE_URL && SUPABASE_URL.startsWith("http")) {
+        function iniciarSupabase() {
+      if (window.supabase && SUPABASE_URL && !SUPABASE_URL.includes("TU_SUPABASE_URL")) {
         try {
-          supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+          supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+            auth: {
+              persistSession: true,
+              autoRefreshToken: true
+            }
+          });
         } catch (err) {
-          console.warn("Aviso cliente Supabase:", err.message);
+          console.error("Error al crear cliente Supabase:", err);
         }
       }
     }
+
 
     const LISTA_ACTIVOS = {
       "Monedas & Cripto": [
