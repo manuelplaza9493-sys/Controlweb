@@ -54,7 +54,7 @@
         Ingresar
       </button>
 
-      <!-- Alternadores de vista con funciones directas -->
+      <!-- Alternadores de vista directos -->
       <div class="space-y-1.5 text-center text-xs">
         <div>
           <button type="button" id="btn-toggle-modo" onclick="cambiarVistaRegistro()" class="text-slate-400 hover:text-amber-300 py-1 px-2 cursor-pointer font-semibold">
@@ -363,7 +363,7 @@
 
   <script>
     // =========================================================
-    // 1. FUNCIONES DE CAMBIO DE PANTALLA DIRECTAS (SIN BLOQUEOS)
+    // 1. FUNCIONES DE INTERFAZ (DIRECTAS Y SIN BLOQUEOS)
     // =========================================================
     var modoAuth = "login"; 
     var emailTemporal = "";
@@ -384,16 +384,16 @@
 
       if (modoAuth === "registro") {
         modoAuth = "login";
-        titulo.textContent = "Iniciar Sesión";
-        btnSubmit.textContent = "Ingresar";
-        btnToggle.textContent = "¿No tienes cuenta? Regístrate";
-        btnOlvido.style.display = "inline-block";
+        if (titulo) titulo.textContent = "Iniciar Sesión";
+        if (btnSubmit) btnSubmit.textContent = "Ingresar";
+        if (btnToggle) btnToggle.textContent = "¿No tienes cuenta? Regístrate";
+        if (btnOlvido) btnOlvido.style.display = "inline-block";
       } else {
         modoAuth = "registro";
-        titulo.textContent = "Crear Cuenta";
-        btnSubmit.textContent = "Registrarme";
-        btnToggle.textContent = "¿Ya tienes cuenta? Inicia sesión";
-        btnOlvido.style.display = "none";
+        if (titulo) titulo.textContent = "Crear Cuenta";
+        if (btnSubmit) btnSubmit.textContent = "Registrarme";
+        if (btnToggle) btnToggle.textContent = "¿Ya tienes cuenta? Inicia sesión";
+        if (btnOlvido) btnOlvido.style.display = "none";
       }
 
       if (passContainer) passContainer.style.display = "block";
@@ -405,14 +405,18 @@
 
     function cambiarVistaRecuperar() {
       modoAuth = "recuperar";
-      document.getElementById("auth-title").textContent = "Recuperar Contraseña";
-      document.getElementById("btn-submit-auth").textContent = "Enviar Código";
-      document.getElementById("btn-toggle-modo").textContent = "Volver al inicio de sesión";
-      document.getElementById("btn-olvido-pass").style.display = "none";
-
+      var titulo = document.getElementById("auth-title");
+      var btnSubmit = document.getElementById("btn-submit-auth");
+      var btnToggle = document.getElementById("btn-toggle-modo");
+      var btnOlvido = document.getElementById("btn-olvido-pass");
       var passContainer = document.getElementById("auth-pass-container");
-      if (passContainer) passContainer.style.display = "none";
 
+      if (titulo) titulo.textContent = "Recuperar Contraseña";
+      if (btnSubmit) btnSubmit.textContent = "Enviar Código";
+      if (btnToggle) btnToggle.textContent = "Volver al inicio de sesión";
+      if (btnOlvido) btnOlvido.style.display = "none";
+
+      if (passContainer) passContainer.style.display = "none";
       document.getElementById("auth-fields-standard").classList.remove("hidden");
       document.getElementById("auth-fields-otp").classList.add("hidden");
       document.getElementById("auth-fields-newpass").classList.add("hidden");
