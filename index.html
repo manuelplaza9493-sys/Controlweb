@@ -7,8 +7,6 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Chart.js para gráficos -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <!-- SDK oficial de Supabase con defer para que no bloquee la pantalla -->
-  <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="bg-slate-950 text-slate-100 p-3 sm:p-6 font-sans min-h-screen">
 
@@ -17,7 +15,7 @@
     <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 w-full max-w-sm shadow-2xl space-y-4">
       <h2 id="auth-title" class="text-xl font-bold text-amber-400">Iniciar Sesión</h2>
       
-      <!-- Campos estándar -->
+      <!-- Campos estándar: Correo y Contraseña -->
       <div id="auth-fields-standard" class="space-y-3">
         <div>
           <label class="block text-xs font-semibold text-slate-400 mb-1">Correo Electrónico</label>
@@ -29,7 +27,7 @@
         </div>
       </div>
 
-      <!-- Campo para Código OTP -->
+      <!-- Campo para Código OTP (6 dígitos) -->
       <div id="auth-fields-otp" style="display: none;" class="space-y-3">
         <p class="text-xs text-slate-400">Hemos enviado un código a tu correo electrónico. Ingrésalo a continuación:</p>
         <div>
@@ -47,7 +45,7 @@
         </div>
       </div>
 
-      <div id="auth-msg" class="text-xs min-h-[1.2rem] text-rose-400 font-medium"></div>
+      <div id="auth-msg" class="text-xs min-h-[1.2rem] text-rose-400 font-medium break-words"></div>
 
       <!-- Botón de acción principal -->
       <button id="btn-submit-auth" onclick="ejecutarAccionAuth()" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-2.5 rounded-lg text-sm transition-colors cursor-pointer">
@@ -70,10 +68,17 @@
     </div>
   </div>
 
-  <!-- SCRIPT AISLADO PARA CONTROL DE VISTAS (Inmune a fallos de librerías) -->
+  <!-- SCRIPT AISLADO PARA CONTROL DE VISTAS -->
   <script>
     var modoAuth = "login";
     var emailTemporal = "";
+
+    function setAuthMsg(texto, esExito) {
+      var msg = document.getElementById("auth-msg");
+      if (!msg) return;
+      msg.textContent = texto || "";
+      msg.className = "text-xs min-h-[1.2rem] font-medium break-words " + (esExito ? "text-emerald-400" : "text-rose-400");
+    }
 
     function cambiarVistaRegistro() {
       var titulo = document.getElementById("auth-title");
@@ -104,7 +109,7 @@
       fieldsStd.style.display = "block";
       fieldsOtp.style.display = "none";
       fieldsNewPass.style.display = "none";
-      document.getElementById("auth-msg").innerText = "";
+      setAuthMsg("", false);
     }
 
     function cambiarVistaRecuperar() {
@@ -118,7 +123,7 @@
       document.getElementById("auth-fields-standard").style.display = "block";
       document.getElementById("auth-fields-otp").style.display = "none";
       document.getElementById("auth-fields-newpass").style.display = "none";
-      document.getElementById("auth-msg").innerText = "";
+      setAuthMsg("", false);
     }
   </script>
 
@@ -312,7 +317,7 @@
                 <th class="py-2.5 px-4 text-right">Variación Diaria</th>
               </tr>
             </thead>
-            <tbody id="tbody-historial" class="divide-y divide-slate-800/60">
+            <tbody id="tbody-historial" class="divide-y border-slate-800/60">
               <tr><td colspan="4" class="p-4 text-center text-slate-500">Cargando registros históricos...</td></tr>
             </tbody>
           </table>
@@ -415,28 +420,11 @@
 
   <script>
     // =========================================================
-    // 2. CONFIGURACIÓN DE CREDENCIALES
+    // 1. CONFIGURACIÓN DE CREDENCIALES (PEGA AQUÍ TUS CLAVES)
     // =========================================================
     const SUPABASE_URL = "https://sxrfyfawbttuvwuyjvct.supabase.co"; // Ej: https://abcdef.supabase.co
-    const SUPABASE_ANON_KEY = "sb_publishable_xjtgreMTwxjySCTk8eT8sA_RRDIxIVj"; // Tu clave pública sb_publishable...
+    const SUPABASE_ANON_KEY = "sb_publishable_xjtgreMTwxjySCTk8eT8sA_RRDIxIVj"; // Tu clave pública sb_publishable_...
     const API_KEY = "224011768fed4370b5bb6e19de465c98"; // Twelve Data
-
-    let supabase = null;
-        function iniciarSupabase() {
-      if (window.supabase && SUPABASE_URL && !SUPABASE_URL.includes("TU_SUPABASE_URL")) {
-        try {
-          supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-            auth: {
-              persistSession: true,
-              autoRefreshToken: true
-            }
-          });
-        } catch (err) {
-          console.error("Error al crear cliente Supabase:", err);
-        }
-      }
-    }
-
 
     const LISTA_ACTIVOS = {
       "Monedas & Cripto": [
@@ -475,42 +463,53 @@
     let chartHistorialInstance = null;
     let chartPatrimonioInstance = null;
 
-    function setAuthMsg(texto, esExito) {
-      var msg = document.getElementById("auth-msg");
-      if (!msg) return;
-      msg.textContent = texto || "";
-      msg.className = "text-xs min-h-[1.2rem] font-medium " + (esExito ? "text-emerald-400" : "text-rose-400");
-      
+    // Encabezados limpios requeridos para endpoints públicos en Supabase con sb_publishable
+    function obtenerHeadersPublicos() {
+      return {
+        "apikey": SUPABASE_ANON_KEY.trim(),
+        "Content-Type": "application/json"
+      };
+    }
+
+    function obtenerHeadersAutenticados() {
+      const token = localStorage.getItem("sb_token");
+      return {
+        "apikey": SUPABASE_ANON_KEY.trim(),
+        "Authorization": "Bearer " + token,
+        "Content-Type": "application/json"
+      };
+    }
+
     // =========================================================
-    // 3. ACCIONES DE AUTENTICACIÓN
+    // 2. ACCIONES DE AUTENTICACIÓN
     // =========================================================
     async function ejecutarAccionAuth() {
+      const btnSubmit = document.getElementById("btn-submit-auth");
       const email = document.getElementById("auth-email").value.trim();
       const password = document.getElementById("auth-password").value;
       const otp = document.getElementById("auth-otp-code").value.trim();
       const nuevaPass = document.getElementById("auth-new-password").value;
 
-      setAuthMsg("");
+      setAuthMsg("", false);
 
       // Verificación de credenciales configuradas
       if (!SUPABASE_URL || SUPABASE_URL.includes("TU_SUPABASE_URL") || !SUPABASE_ANON_KEY || SUPABASE_ANON_KEY.includes("TU_SUPABASE_ANON")) {
-        setAuthMsg("Debes colocar tu URL y tu clave pública en el código.");
+        setAuthMsg("Debes colocar tu URL y clave de Supabase en el código.");
         return;
       }
 
-      const headers = {
-        "apikey": SUPABASE_ANON_KEY,
-        "Authorization": "Bearer " + SUPABASE_ANON_KEY,
-        "Content-Type": "application/json"
-      };
+      const urlBase = SUPABASE_URL.trim().replace(/\/+$/, "");
 
       try {
         if (modoAuth === "login") {
           if (!email || !password) return setAuthMsg("Completa correo y contraseña.");
 
-          const res = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
+          btnSubmit.innerText = "Ingresando...";
+          btnSubmit.disabled = true;
+
+          const res = await fetch(`${urlBase}/auth/v1/token?grant_type=password`, {
             method: "POST",
-            headers: headers,
+            headers: obtenerHeadersPublicos(),
             body: JSON.stringify({ email, password })
           });
           const data = await res.json();
@@ -523,32 +522,45 @@
           if (!email || !password) return setAuthMsg("Completa todos los campos.");
           if (password.length < 6) return setAuthMsg("La contraseña debe tener al menos 6 caracteres.");
 
-          const res = await fetch(`${SUPABASE_URL}/auth/v1/signup`, {
+          btnSubmit.innerText = "Registrando...";
+          btnSubmit.disabled = true;
+
+          const res = await fetch(`${urlBase}/auth/v1/signup`, {
             method: "POST",
-            headers: headers,
+            headers: obtenerHeadersPublicos(),
             body: JSON.stringify({ email, password })
           });
           const data = await res.json();
           if (!res.ok) throw new Error(data.error_description || data.msg || data.message || "Error al registrarse.");
 
+          if (data.identities && data.identities.length === 0) {
+            setAuthMsg("Este correo ya está registrado. Toca abajo en '¿Ya tienes cuenta? Inicia sesión'.");
+            return;
+          }
+
           emailTemporal = email;
           modoAuth = "otp_registro";
+
           document.getElementById("auth-title").innerText = "Confirma tu Cuenta";
           document.getElementById("auth-fields-standard").style.display = "none";
           document.getElementById("auth-fields-otp").style.display = "block";
-          document.getElementById("btn-submit-auth").innerText = "Confirmar Código";
-          setAuthMsg("Código de verificación enviado a tu email", true);
+          btnSubmit.innerText = "Confirmar Código";
+
+          setAuthMsg("Código de verificación enviado a tu email.", true);
         }
         else if (modoAuth === "otp_registro") {
           if (otp.length < 6) return setAuthMsg("Ingresa el código de 6 dígitos.");
 
-          const res = await fetch(`${SUPABASE_URL}/auth/v1/verify`, {
+          btnSubmit.innerText = "Verificando...";
+          btnSubmit.disabled = true;
+
+          const res = await fetch(`${urlBase}/auth/v1/verify`, {
             method: "POST",
-            headers: headers,
+            headers: obtenerHeadersPublicos(),
             body: JSON.stringify({ type: "signup", email: emailTemporal, token: otp })
           });
           const data = await res.json();
-          if (!res.ok) throw new Error(data.error_description || data.msg || data.message || "Código inválido.");
+          if (!res.ok) throw new Error(data.error_description || data.msg || data.message || "Código incorrecto o expirado.");
 
           localStorage.setItem("sb_token", data.access_token);
           await cargarSesion(data.user);
@@ -556,9 +568,12 @@
         else if (modoAuth === "recuperar") {
           if (!email) return setAuthMsg("Ingresa tu correo electrónico.");
 
-          const res = await fetch(`${SUPABASE_URL}/auth/v1/recover`, {
+          btnSubmit.innerText = "Enviando código...";
+          btnSubmit.disabled = true;
+
+          const res = await fetch(`${urlBase}/auth/v1/recover`, {
             method: "POST",
-            headers: headers,
+            headers: obtenerHeadersPublicos(),
             body: JSON.stringify({ email })
           });
           const data = await res.json();
@@ -569,15 +584,18 @@
           document.getElementById("auth-title").innerText = "Código de Recuperación";
           document.getElementById("auth-fields-standard").style.display = "none";
           document.getElementById("auth-fields-otp").style.display = "block";
-          document.getElementById("btn-submit-auth").innerText = "Verificar Código";
+          btnSubmit.innerText = "Verificar Código";
           setAuthMsg("Código enviado a " + email, true);
         }
         else if (modoAuth === "otp_recuperar") {
           if (otp.length < 6) return setAuthMsg("Ingresa el código de 6 dígitos.");
 
-          const res = await fetch(`${SUPABASE_URL}/auth/v1/verify`, {
+          btnSubmit.innerText = "Validando...";
+          btnSubmit.disabled = true;
+
+          const res = await fetch(`${urlBase}/auth/v1/verify`, {
             method: "POST",
-            headers: headers,
+            headers: obtenerHeadersPublicos(),
             body: JSON.stringify({ type: "recovery", email: emailTemporal, token: otp })
           });
           const data = await res.json();
@@ -588,17 +606,17 @@
           document.getElementById("auth-title").innerText = "Nueva Contraseña";
           document.getElementById("auth-fields-otp").style.display = "none";
           document.getElementById("auth-fields-newpass").style.display = "block";
-          document.getElementById("btn-submit-auth").innerText = "Guardar Nueva Contraseña";
+          btnSubmit.innerText = "Guardar Nueva Contraseña";
         }
         else if (modoAuth === "nueva_pass") {
           if (nuevaPass.length < 6) return setAuthMsg("Debe tener al menos 6 caracteres.");
 
-          const token = localStorage.getItem("sb_token");
-          const authHeaders = { ...headers, "Authorization": "Bearer " + token };
+          btnSubmit.innerText = "Actualizando...";
+          btnSubmit.disabled = true;
 
-          const res = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+          const res = await fetch(`${urlBase}/auth/v1/user`, {
             method: "PUT",
-            headers: authHeaders,
+            headers: obtenerHeadersAutenticados(),
             body: JSON.stringify({ password: nuevaPass })
           });
           const data = await res.json();
@@ -608,7 +626,14 @@
           await cargarSesion(data);
         }
       } catch (err) {
-        setAuthMsg(err.message || "Error al procesar la solicitud.");
+        setAuthMsg(err.message || "Error de conexión.", false);
+      } finally {
+        btnSubmit.disabled = false;
+        if (modoAuth === "login") btnSubmit.innerText = "Ingresar";
+        else if (modoAuth === "registro") btnSubmit.innerText = "Registrarme";
+        else if (modoAuth === "otp_registro" || modoAuth === "otp_recuperar") btnSubmit.innerText = "Confirmar Código";
+        else if (modoAuth === "recuperar") btnSubmit.innerText = "Enviar Código";
+        else if (modoAuth === "nueva_pass") btnSubmit.innerText = "Guardar Nueva Contraseña";
       }
     }
 
@@ -625,35 +650,40 @@
       location.reload();
     }
 
-      
     // =========================================================
-    // 4. PERSISTENCIA EN NUBE
+    // 3. PERSISTENCIA EN NUBE (REST POSTGREST CON FETCH)
     // =========================================================
     async function cargarDatosDesdeNube() {
-      if (!usuarioActual || !supabase) return;
+      if (!usuarioActual) return;
+      const urlBase = SUPABASE_URL.trim().replace(/\/+$/, "");
       try {
-        const { data, error } = await supabase
-          .from('perfiles_financieros')
-          .select('*')
-          .eq('id', usuarioActual.id)
-          .single();
-
-        if (data) {
-          perfilDatos = {
-            favoritos: data.favoritos || [],
-            compras: data.compras || {},
-            tenencias_ars: data.tenencias_ars || { plazoFijo: 0, plazoFijoUVA: 0, efectivoARS: 0 },
-            alertas: data.alertas || {}
-          };
-        } else {
-          await supabase.from('perfiles_financieros').insert([{
-            id: usuarioActual.id,
-            email: usuarioActual.email,
-            favoritos: [],
-            compras: {},
-            tenencias_ars: { plazoFijo: 0, plazoFijoUVA: 0, efectivoARS: 0 },
-            alertas: {}
-          }]);
+        const res = await fetch(`${urlBase}/rest/v1/perfiles_financieros?id=eq.${usuarioActual.id}&select=*`, {
+          method: "GET",
+          headers: obtenerHeadersAutenticados()
+        });
+        if (res.ok) {
+          const list = await res.json();
+          if (list && list.length > 0) {
+            perfilDatos = {
+              favoritos: list[0].favoritos || [],
+              compras: list[0].compras || {},
+              tenencias_ars: list[0].tenencias_ars || { plazoFijo: 0, plazoFijoUVA: 0, efectivoARS: 0 },
+              alertas: list[0].alertas || {}
+            };
+          } else {
+            await fetch(`${urlBase}/rest/v1/perfiles_financieros`, {
+              method: "POST",
+              headers: { ...obtenerHeadersAutenticados(), "Prefer": "return=minimal" },
+              body: JSON.stringify({
+                id: usuarioActual.id,
+                email: usuarioActual.email,
+                favoritos: [],
+                compras: {},
+                tenencias_ars: { plazoFijo: 0, plazoFijoUVA: 0, efectivoARS: 0 },
+                alertas: {}
+              })
+            });
+          }
         }
       } catch (e) {
         console.warn("Aviso al cargar perfil:", e);
@@ -661,25 +691,31 @@
     }
 
     async function sincronizarNube() {
-      if (!usuarioActual || !supabase) return;
+      if (!usuarioActual) return;
+      const urlBase = SUPABASE_URL.trim().replace(/\/+$/, "");
       try {
-        await supabase
-          .from('perfiles_financieros')
-          .upsert({
+        await fetch(`${urlBase}/rest/v1/perfiles_financieros`, {
+          method: "POST",
+          headers: {
+            ...obtenerHeadersAutenticados(),
+            "Prefer": "resolution=merge-duplicates,return=minimal"
+          },
+          body: JSON.stringify({
             id: usuarioActual.id,
             favoritos: perfilDatos.favoritos,
             compras: perfilDatos.compras,
             tenencias_ars: perfilDatos.tenencias_ars,
             alertas: perfilDatos.alertas,
             updated_at: new Date().toISOString()
-          });
+          })
+        });
       } catch (e) {
         console.error("Error sincronizando:", e);
       }
     }
 
     // =========================================================
-    // 5. NAVEGACIÓN Y MERCADO
+    // 4. NAVEGACIÓN Y MERCADO
     // =========================================================
     function cambiarSolapa(solapa) {
       document.getElementById("solapa-mercado").classList.add("hidden");
@@ -1402,15 +1438,22 @@
     }
 
     window.addEventListener("DOMContentLoaded", async () => {
-      iniciarSupabase();
-      if (supabase) {
+      const token = localStorage.getItem("sb_token");
+      if (token && SUPABASE_URL && !SUPABASE_URL.includes("TU_SUPABASE_URL")) {
         try {
-          const { data: { session } } = await supabase.auth.getSession();
-          if (session) {
-            await cargarSesion(session.user);
+          const urlBase = SUPABASE_URL.trim().replace(/\/+$/, "");
+          const res = await fetch(`${urlBase}/auth/v1/user`, {
+            method: "GET",
+            headers: obtenerHeadersAutenticados()
+          });
+          if (res.ok) {
+            const user = await res.json();
+            await cargarSesion(user);
+          } else {
+            localStorage.removeItem("sb_token");
           }
         } catch (e) {
-          console.warn("Sin sesión previa activa.");
+          console.warn("Sin sesión activa previa válida.");
         }
       }
     });
