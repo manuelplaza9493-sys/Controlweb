@@ -480,18 +480,11 @@
       if (!msg) return;
       msg.textContent = texto || "";
       msg.className = "text-xs min-h-[1.2rem] font-medium " + (esExito ? "text-emerald-400" : "text-rose-400");
-    }
-
+      
     // =========================================================
     // 3. ACCIONES DE AUTENTICACIÓN
     // =========================================================
     async function ejecutarAccionAuth() {
-      iniciarSupabase();
-      if (!supabase) {
-        setAuthMsg("Revisa que SUPABASE_URL y SUPABASE_ANON_KEY estén configuradas.");
-        return;
-      }
-
       const email = document.getElementById("auth-email").value.trim();
       const password = document.getElementById("auth-password").value;
       const otp = document.getElementById("auth-otp-code").value.trim();
@@ -499,19 +492,44 @@
 
       setAuthMsg("");
 
+      // Verificación de credenciales configuradas
+      if (!SUPABASE_URL || SUPABASE_URL.includes("TU_SUPABASE_URL") || !SUPABASE_ANON_KEY || SUPABASE_ANON_KEY.includes("TU_SUPABASE_ANON")) {
+        setAuthMsg("Debes colocar tu URL y tu clave pública en el código.");
+        return;
+      }
+
+      const headers = {
+        "apikey": SUPABASE_ANON_KEY,
+        "Authorization": "Bearer " + SUPABASE_ANON_KEY,
+        "Content-Type": "application/json"
+      };
+
       try {
         if (modoAuth === "login") {
           if (!email || !password) return setAuthMsg("Completa correo y contraseña.");
-          const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-          if (error) throw error;
+
+          const res = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
+            method: "POST",
+            headers: headers,
+            body: JSON.stringify({ email, password })
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error_description || data.msg || data.message || "Error al iniciar sesión.");
+
+          localStorage.setItem("sb_token", data.access_token);
           await cargarSesion(data.user);
         }
         else if (modoAuth === "registro") {
           if (!email || !password) return setAuthMsg("Completa todos los campos.");
           if (password.length < 6) return setAuthMsg("La contraseña debe tener al menos 6 caracteres.");
 
-          const { data, error } = await supabase.auth.signUp({ email, password });
-          if (error) throw error;
+          const res = await fetch(`${SUPABASE_URL}/auth/v1/signup`, {
+            method: "POST",
+            headers: headers,
+            body: JSON.stringify({ email, password })
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error_description || data.msg || data.message || "Error al registrarse.");
 
           emailTemporal = email;
           modoAuth = "otp_registro";
@@ -523,14 +541,28 @@
         }
         else if (modoAuth === "otp_registro") {
           if (otp.length < 6) return setAuthMsg("Ingresa el código de 6 dígitos.");
-          const { data, error } = await supabase.auth.verifyOtp({ email: emailTemporal, token: otp, type: 'signup' });
-          if (error) throw error;
+
+          const res = await fetch(`${SUPABASE_URL}/auth/v1/verify`, {
+            method: "POST",
+            headers: headers,
+            body: JSON.stringify({ type: "signup", email: emailTemporal, token: otp })
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error_description || data.msg || data.message || "Código inválido.");
+
+          localStorage.setItem("sb_token", data.access_token);
           await cargarSesion(data.user);
         }
         else if (modoAuth === "recuperar") {
           if (!email) return setAuthMsg("Ingresa tu correo electrónico.");
-          const { error } = await supabase.auth.resetPasswordForEmail(email);
-          if (error) throw error;
+
+          const res = await fetch(`${SUPABASE_URL}/auth/v1/recover`, {
+            method: "POST",
+            headers: headers,
+            body: JSON.stringify({ email })
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error_description || data.msg || data.message || "Error al solicitar código.");
 
           emailTemporal = email;
           modoAuth = "otp_recuperar";
@@ -542,9 +574,16 @@
         }
         else if (modoAuth === "otp_recuperar") {
           if (otp.length < 6) return setAuthMsg("Ingresa el código de 6 dígitos.");
-          const { data, error } = await supabase.auth.verifyOtp({ email: emailTemporal, token: otp, type: 'recovery' });
-          if (error) throw error;
 
+          const res = await fetch(`${SUPABASE_URL}/auth/v1/verify`, {
+            method: "POST",
+            headers: headers,
+            body: JSON.stringify({ type: "recovery", email: emailTemporal, token: otp })
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error_description || data.msg || data.message || "Código incorrecto.");
+
+          localStorage.setItem("sb_token", data.access_token);
           modoAuth = "nueva_pass";
           document.getElementById("auth-title").innerText = "Nueva Contraseña";
           document.getElementById("auth-fields-otp").style.display = "none";
@@ -553,10 +592,20 @@
         }
         else if (modoAuth === "nueva_pass") {
           if (nuevaPass.length < 6) return setAuthMsg("Debe tener al menos 6 caracteres.");
-          const { data, error } = await supabase.auth.updateUser({ password: nuevaPass });
-          if (error) throw error;
+
+          const token = localStorage.getItem("sb_token");
+          const authHeaders = { ...headers, "Authorization": "Bearer " + token };
+
+          const res = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+            method: "PUT",
+            headers: authHeaders,
+            body: JSON.stringify({ password: nuevaPass })
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error_description || data.msg || data.message || "Error al actualizar contraseña.");
+
           alert("Contraseña restablecida correctamente.");
-          await cargarSesion(data.user);
+          await cargarSesion(data);
         }
       } catch (err) {
         setAuthMsg(err.message || "Error al procesar la solicitud.");
@@ -566,16 +615,17 @@
     async function cargarSesion(user) {
       usuarioActual = user;
       document.getElementById("auth-modal").classList.add("hidden");
-      document.getElementById("user-badge").textContent = user.email.split('@')[0];
+      document.getElementById("user-badge").textContent = user.email ? user.email.split('@')[0] : "Usuario";
       await cargarDatosDesdeNube();
       inicializarApp();
     }
 
     async function cerrarSesion() {
-      if (supabase) await supabase.auth.signOut();
+      localStorage.removeItem("sb_token");
       location.reload();
     }
 
+      
     // =========================================================
     // 4. PERSISTENCIA EN NUBE
     // =========================================================
