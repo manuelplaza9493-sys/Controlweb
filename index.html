@@ -5,19 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Plataforma Financiera & Control de Cartera</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Chart.js para gráficos interactivos -->
+  <!-- Chart.js para gráficos -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <!-- SDK oficial de Supabase -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- SDK oficial de Supabase con defer para que no bloquee la pantalla -->
+  <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="bg-slate-950 text-slate-100 p-3 sm:p-6 font-sans min-h-screen">
 
-  <!-- MODAL AUTENTICACIÓN (LOGIN / REGISTRO / RECUPERACIÓN / CÓDIGO) -->
+  <!-- MODAL AUTENTICACIÓN -->
   <div id="auth-modal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-sm flex items-center justify-center p-4 z-50">
     <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 w-full max-w-sm shadow-2xl space-y-4">
       <h2 id="auth-title" class="text-xl font-bold text-amber-400">Iniciar Sesión</h2>
       
-      <!-- Campos estándar: Correo y Contraseña -->
+      <!-- Campos estándar -->
       <div id="auth-fields-standard" class="space-y-3">
         <div>
           <label class="block text-xs font-semibold text-slate-400 mb-1">Correo Electrónico</label>
@@ -29,8 +29,8 @@
         </div>
       </div>
 
-      <!-- Campo para Código OTP (6 dígitos) -->
-      <div id="auth-fields-otp" class="hidden space-y-3">
+      <!-- Campo para Código OTP -->
+      <div id="auth-fields-otp" style="display: none;" class="space-y-3">
         <p class="text-xs text-slate-400">Hemos enviado un código a tu correo electrónico. Ingrésalo a continuación:</p>
         <div>
           <label class="block text-xs font-semibold text-slate-400 mb-1">Código de 6 dígitos</label>
@@ -38,8 +38,8 @@
         </div>
       </div>
 
-      <!-- Campo para definir nueva contraseña tras validación de código -->
-      <div id="auth-fields-newpass" class="hidden space-y-3">
+      <!-- Campo para definir nueva contraseña -->
+      <div id="auth-fields-newpass" style="display: none;" class="space-y-3">
         <p class="text-xs text-emerald-400">Código validado. Define tu nueva contraseña:</p>
         <div>
           <label class="block text-xs font-semibold text-slate-400 mb-1">Nueva Contraseña</label>
@@ -54,21 +54,73 @@
         Ingresar
       </button>
 
-      <!-- Alternadores de vista directos -->
+      <!-- Alternadores de vista -->
       <div class="space-y-1.5 text-center text-xs">
         <div>
-          <button type="button" id="btn-toggle-modo" onclick="cambiarVistaRegistro()" class="text-slate-400 hover:text-amber-300 py-1 px-2 cursor-pointer font-semibold">
+          <button type="button" id="btn-toggle-modo" onclick="cambiarVistaRegistro()" class="text-slate-400 hover:text-amber-300 py-1.5 px-3 cursor-pointer font-semibold inline-block">
             ¿No tienes cuenta? Regístrate
           </button>
         </div>
         <div>
-          <button type="button" id="btn-olvido-pass" onclick="cambiarVistaRecuperar()" class="text-slate-500 hover:text-rose-400 text-[11px] underline py-1 px-2 cursor-pointer">
+          <button type="button" id="btn-olvido-pass" onclick="cambiarVistaRecuperar()" class="text-slate-500 hover:text-rose-400 text-[11px] underline py-1.5 px-3 cursor-pointer inline-block">
             ¿Olvidaste tu contraseña?
           </button>
         </div>
       </div>
     </div>
   </div>
+
+  <!-- SCRIPT AISLADO PARA CONTROL DE VISTAS (Inmune a fallos de librerías) -->
+  <script>
+    var modoAuth = "login";
+    var emailTemporal = "";
+
+    function cambiarVistaRegistro() {
+      var titulo = document.getElementById("auth-title");
+      var btnSubmit = document.getElementById("btn-submit-auth");
+      var btnToggle = document.getElementById("btn-toggle-modo");
+      var btnOlvido = document.getElementById("btn-olvido-pass");
+      var passContainer = document.getElementById("auth-pass-container");
+
+      var fieldsStd = document.getElementById("auth-fields-standard");
+      var fieldsOtp = document.getElementById("auth-fields-otp");
+      var fieldsNewPass = document.getElementById("auth-fields-newpass");
+
+      if (modoAuth === "registro") {
+        modoAuth = "login";
+        titulo.innerText = "Iniciar Sesión";
+        btnSubmit.innerText = "Ingresar";
+        btnToggle.innerText = "¿No tienes cuenta? Regístrate";
+        btnOlvido.style.display = "inline-block";
+      } else {
+        modoAuth = "registro";
+        titulo.innerText = "Crear Cuenta";
+        btnSubmit.innerText = "Registrarme";
+        btnToggle.innerText = "¿Ya tienes cuenta? Inicia sesión";
+        btnOlvido.style.display = "none";
+      }
+
+      passContainer.style.display = "block";
+      fieldsStd.style.display = "block";
+      fieldsOtp.style.display = "none";
+      fieldsNewPass.style.display = "none";
+      document.getElementById("auth-msg").innerText = "";
+    }
+
+    function cambiarVistaRecuperar() {
+      modoAuth = "recuperar";
+      document.getElementById("auth-title").innerText = "Recuperar Contraseña";
+      document.getElementById("btn-submit-auth").innerText = "Enviar Código";
+      document.getElementById("btn-toggle-modo").innerText = "Volver al inicio de sesión";
+      document.getElementById("btn-olvido-pass").style.display = "none";
+
+      document.getElementById("auth-pass-container").style.display = "none";
+      document.getElementById("auth-fields-standard").style.display = "block";
+      document.getElementById("auth-fields-otp").style.display = "none";
+      document.getElementById("auth-fields-newpass").style.display = "none";
+      document.getElementById("auth-msg").innerText = "";
+    }
+  </script>
 
   <!-- Modal Compra Renta Variable -->
   <div id="modal-compra" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
@@ -363,67 +415,6 @@
 
   <script>
     // =========================================================
-    // 1. FUNCIONES DE INTERFAZ (DIRECTAS Y SIN BLOQUEOS)
-    // =========================================================
-    var modoAuth = "login"; 
-    var emailTemporal = "";
-
-    function setAuthMsg(texto, esExito) {
-      var msg = document.getElementById("auth-msg");
-      if (!msg) return;
-      msg.textContent = texto || "";
-      msg.className = "text-xs min-h-[1.2rem] font-medium " + (esExito ? "text-emerald-400" : "text-rose-400");
-    }
-
-    function cambiarVistaRegistro() {
-      var titulo = document.getElementById("auth-title");
-      var btnSubmit = document.getElementById("btn-submit-auth");
-      var btnToggle = document.getElementById("btn-toggle-modo");
-      var btnOlvido = document.getElementById("btn-olvido-pass");
-      var passContainer = document.getElementById("auth-pass-container");
-
-      if (modoAuth === "registro") {
-        modoAuth = "login";
-        if (titulo) titulo.textContent = "Iniciar Sesión";
-        if (btnSubmit) btnSubmit.textContent = "Ingresar";
-        if (btnToggle) btnToggle.textContent = "¿No tienes cuenta? Regístrate";
-        if (btnOlvido) btnOlvido.style.display = "inline-block";
-      } else {
-        modoAuth = "registro";
-        if (titulo) titulo.textContent = "Crear Cuenta";
-        if (btnSubmit) btnSubmit.textContent = "Registrarme";
-        if (btnToggle) btnToggle.textContent = "¿Ya tienes cuenta? Inicia sesión";
-        if (btnOlvido) btnOlvido.style.display = "none";
-      }
-
-      if (passContainer) passContainer.style.display = "block";
-      document.getElementById("auth-fields-standard").classList.remove("hidden");
-      document.getElementById("auth-fields-otp").classList.add("hidden");
-      document.getElementById("auth-fields-newpass").classList.add("hidden");
-      setAuthMsg("");
-    }
-
-    function cambiarVistaRecuperar() {
-      modoAuth = "recuperar";
-      var titulo = document.getElementById("auth-title");
-      var btnSubmit = document.getElementById("btn-submit-auth");
-      var btnToggle = document.getElementById("btn-toggle-modo");
-      var btnOlvido = document.getElementById("btn-olvido-pass");
-      var passContainer = document.getElementById("auth-pass-container");
-
-      if (titulo) titulo.textContent = "Recuperar Contraseña";
-      if (btnSubmit) btnSubmit.textContent = "Enviar Código";
-      if (btnToggle) btnToggle.textContent = "Volver al inicio de sesión";
-      if (btnOlvido) btnOlvido.style.display = "none";
-
-      if (passContainer) passContainer.style.display = "none";
-      document.getElementById("auth-fields-standard").classList.remove("hidden");
-      document.getElementById("auth-fields-otp").classList.add("hidden");
-      document.getElementById("auth-fields-newpass").classList.add("hidden");
-      setAuthMsg("");
-    }
-
-    // =========================================================
     // 2. CONFIGURACIÓN DE CREDENCIALES
     // =========================================================
     const SUPABASE_URL = "https://sxrfyfawbttuvwuyjvct.supabase.co"; // Ej: https://abcdef.supabase.co
@@ -431,11 +422,13 @@
     const API_KEY = "224011768fed4370b5bb6e19de465c98"; // Twelve Data
 
     let supabase = null;
-    if (window.supabase && SUPABASE_URL && SUPABASE_URL.startsWith("http")) {
-      try {
-        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-      } catch (err) {
-        console.warn("Aviso cliente Supabase:", err.message);
+    function iniciarSupabase() {
+      if (window.supabase && SUPABASE_URL && SUPABASE_URL.startsWith("http")) {
+        try {
+          supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        } catch (err) {
+          console.warn("Aviso cliente Supabase:", err.message);
+        }
       }
     }
 
@@ -476,10 +469,18 @@
     let chartHistorialInstance = null;
     let chartPatrimonioInstance = null;
 
+    function setAuthMsg(texto, esExito) {
+      var msg = document.getElementById("auth-msg");
+      if (!msg) return;
+      msg.textContent = texto || "";
+      msg.className = "text-xs min-h-[1.2rem] font-medium " + (esExito ? "text-emerald-400" : "text-rose-400");
+    }
+
     // =========================================================
     // 3. ACCIONES DE AUTENTICACIÓN
     // =========================================================
     async function ejecutarAccionAuth() {
+      iniciarSupabase();
       if (!supabase) {
         setAuthMsg("Revisa que SUPABASE_URL y SUPABASE_ANON_KEY estén configuradas.");
         return;
@@ -508,10 +509,10 @@
 
           emailTemporal = email;
           modoAuth = "otp_registro";
-          document.getElementById("auth-title").textContent = "Confirma tu Cuenta";
-          document.getElementById("auth-fields-standard").classList.add("hidden");
-          document.getElementById("auth-fields-otp").classList.remove("hidden");
-          document.getElementById("btn-submit-auth").textContent = "Confirmar Código";
+          document.getElementById("auth-title").innerText = "Confirma tu Cuenta";
+          document.getElementById("auth-fields-standard").style.display = "none";
+          document.getElementById("auth-fields-otp").style.display = "block";
+          document.getElementById("btn-submit-auth").innerText = "Confirmar Código";
           setAuthMsg("Código de verificación enviado a tu email", true);
         }
         else if (modoAuth === "otp_registro") {
@@ -527,10 +528,10 @@
 
           emailTemporal = email;
           modoAuth = "otp_recuperar";
-          document.getElementById("auth-title").textContent = "Código de Recuperación";
-          document.getElementById("auth-fields-standard").classList.add("hidden");
-          document.getElementById("auth-fields-otp").classList.remove("hidden");
-          document.getElementById("btn-submit-auth").textContent = "Verificar Código";
+          document.getElementById("auth-title").innerText = "Código de Recuperación";
+          document.getElementById("auth-fields-standard").style.display = "none";
+          document.getElementById("auth-fields-otp").style.display = "block";
+          document.getElementById("btn-submit-auth").innerText = "Verificar Código";
           setAuthMsg("Código enviado a " + email, true);
         }
         else if (modoAuth === "otp_recuperar") {
@@ -539,10 +540,10 @@
           if (error) throw error;
 
           modoAuth = "nueva_pass";
-          document.getElementById("auth-title").textContent = "Nueva Contraseña";
-          document.getElementById("auth-fields-otp").classList.add("hidden");
-          document.getElementById("auth-fields-newpass").classList.remove("hidden");
-          document.getElementById("btn-submit-auth").textContent = "Guardar Nueva Contraseña";
+          document.getElementById("auth-title").innerText = "Nueva Contraseña";
+          document.getElementById("auth-fields-otp").style.display = "none";
+          document.getElementById("auth-fields-newpass").style.display = "block";
+          document.getElementById("btn-submit-auth").innerText = "Guardar Nueva Contraseña";
         }
         else if (modoAuth === "nueva_pass") {
           if (nuevaPass.length < 6) return setAuthMsg("Debe tener al menos 6 caracteres.");
@@ -1345,6 +1346,7 @@
     }
 
     window.addEventListener("DOMContentLoaded", async () => {
+      iniciarSupabase();
       if (supabase) {
         try {
           const { data: { session } } = await supabase.auth.getSession();
