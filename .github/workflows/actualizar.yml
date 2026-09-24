@@ -1,19 +1,19 @@
-name: Recoleccion Diaria de Cotizaciones
+name: Recoleccion Diario de Cotizaciones
 
 on:
   schedule:
-    # Se ejecuta automáticamente de lunes a viernes a las 22:00 UTC (al cierre de mercado)
-    - cron: '0 22 * * 1-5'
-  workflow_dispatch: # Permite ejecutar el flujo manualmente con un botón desde GitHub
+    - cron: '0 21 * * 1-5'
+  workflow_dispatch:
 
 permissions:
-  contents: write # Permiso obligatorio para que el bot pueda guardar y hacer commit de los JSON
+  contents: write
 
 jobs:
   recolectar:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Descargar repositorio
+      - name: Checkout del repositorio
         uses: actions/checkout@v4
 
       - name: Configurar Python
@@ -22,17 +22,17 @@ jobs:
           python-version: '3.10'
 
       - name: Instalar librerías
-        run: pip install requests
+        run: |
+          pip install requests
 
-      - name: Ejecutar script recolector
-        env:
-          TWELVE_DATA_API_KEY: ${{ secrets.TWELVE_DATA_API_KEY }}
-        run: python collector.py
+      - name: Ejecutar script de recoleccion
+        run: |
+          python coleccionista.py
 
       - name: Guardar y subir cambios
         run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action Bot"
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add precios.json historial.json
-          git commit -m "Auto: Actualizacion de cotizaciones e historial [skip ci]" || exit 0
+          git commit -m "Actualizar cotizaciones [skip ci]" || echo "No hay cambios para commitear"
           git push
