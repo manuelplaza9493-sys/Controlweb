@@ -2,67 +2,67 @@
   "BTC/USD": [
     {
       "fecha": "2026-09-24",
-      "precio": 84216.01
+      "precio": 84375.0
     }
   ],
   "ETH/USD": [
     {
       "fecha": "2026-09-24",
-      "precio": 2683.91
+      "precio": 2687.98
     }
   ],
   "SOL/USD": [
     {
       "fecha": "2026-09-24",
-      "precio": 116.83
+      "precio": 116.73
     }
   ],
   "PAXG/USD": [
     {
       "fecha": "2026-09-24",
-      "precio": 4261.58984
+      "precio": 4267.93994
     }
   ],
   "USO": [
     {
       "fecha": "2026-09-24",
-      "precio": 153.13
+      "precio": 153.039993
     }
   ],
   "BNO": [
     {
       "fecha": "2026-09-24",
-      "precio": 61.85
+      "precio": 61.86
     }
   ],
   "SLV": [
     {
       "fecha": "2026-09-24",
-      "precio": 57.615
+      "precio": 57.6
     }
   ],
   "EUR/USD": [
     {
       "fecha": "2026-09-24",
-      "precio": 1.13716
+      "precio": 1.13775
     }
   ],
   "USD/ARS": [
     {
       "fecha": "2026-09-24",
-      "precio": 1519.79817
+      "precio": 1519.83554
     }
   ],
   "XAU/USD": [
     {
       "fecha": "2026-09-24",
-      "precio": 4267.30392
+      "precio": 4278.44094
     }
   ],
   "GGAL": [
     {
       "fecha": "2026-09-24",
-      "precio": 39.615
+      "precio": 39.61
     }
   ],
   "BMA": [
@@ -86,7 +86,7 @@
   "MELI": [
     {
       "fecha": "2026-09-24",
-      "precio": 1753.29
+      "precio": 1754.34998
     }
   ],
   "GLOB": [
