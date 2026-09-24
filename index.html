@@ -432,15 +432,16 @@
     const API_KEY = "224011768fed4370b5bb6e19de465c98"; // Twelve Data
 
     // ESTRUCTURA COMPLETA DE ACTIVOS POR SECTOR
-        const LISTA_ACTIVOS = {
+    const LISTA_ACTIVOS = {
       "Commodities, Cripto & Divisas": [
         { ticker: "BTC/USD", nombre: "Bitcoin" },
         { ticker: "ETH/USD", nombre: "Ethereum" },
         { ticker: "SOL/USD", nombre: "Solana" },
-        { ticker: "PAXG/USD", nombre: "Oro Onza (PAXG Físico)" },
+        { ticker: "PAXG/USD", nombre: "Oro Tokenizado (PAXG Físico)" },
+        { ticker: "GLD", nombre: "Oro Físico (ETF SPDR Gold)" },
+        { ticker: "SLV", nombre: "Plata Física (ETF iShares)" },
         { ticker: "USO", nombre: "Petróleo Crudo WTI (ETF)" },
         { ticker: "BNO", nombre: "Petróleo Brent (ETF)" },
-        { ticker: "SLV", nombre: "Plata Física (ETF iShares)" },
         { ticker: "EUR/USD", nombre: "Euro / Dólar" },
         { ticker: "USD/ARS", nombre: "Dólar Oficial" }
       ],
@@ -453,7 +454,7 @@
         { ticker: "GLOB", nombre: "Globant" },
         { ticker: "VIST", nombre: "Vista Energy" },
         { ticker: "TX", nombre: "Ternium" },
-        { ticker: "CRES", nombre: "Cresud" },
+        { ticker: "AGRO", nombre: "Adecoagro (Agroindustria)" },
         { ticker: "EDN", nombre: "Edenor" },
         { ticker: "TGS", nombre: "Transp. Gas del Sur" },
         { ticker: "BBAR", nombre: "BBVA Argentina" },
@@ -463,7 +464,7 @@
         { ticker: "SUPV", nombre: "Grupo Supervielle" },
         { ticker: "BIOX", nombre: "Bioceres Crop Solutions" },
         { ticker: "LOMA", nombre: "Loma Negra" },
-        { ticker: "DESP", nombre: "Despegar.com" },
+        { ticker: "TS", nombre: "Tenaris (Tubos de Acero)" },
         { ticker: "CAAP", nombre: "Corp. América Airports" }
       ],
       "Tecnología Top 10": [
@@ -481,7 +482,7 @@
       "IA & Semiconductores Top 10": [
         { ticker: "NVDA", nombre: "NVIDIA" },
         { ticker: "AMD", nombre: "Advanced Micro Devices" },
-        { ticker: "TSM", nombre: "Taiwan Semiconductor (TSMC)" },
+        { ticker: "TSM", nombre: "Taiwan Semi (TSMC)" },
         { ticker: "AVGO", nombre: "Broadcom" },
         { ticker: "ASML", nombre: "ASML Holding" },
         { ticker: "QCOM", nombre: "Qualcomm" },
@@ -490,7 +491,7 @@
         { ticker: "PLTR", nombre: "Palantir Technologies" },
         { ticker: "MU", nombre: "Micron Technology" }
       ],
-      "Minería & Litio Top 10": [
+      "Minería & Metales Top 10": [
         { ticker: "BHP", nombre: "BHP Group" },
         { ticker: "RIO", nombre: "Rio Tinto" },
         { ticker: "VALE", nombre: "Vale S.A." },
@@ -500,16 +501,16 @@
         { ticker: "NEM", nombre: "Newmont (Oro)" },
         { ticker: "GOLD", nombre: "Barrick Gold" },
         { ticker: "SQM", nombre: "Soc. Química y Minera Chile" },
-        { ticker: "ALTM", nombre: "Arcadium Lithium" }
+        { ticker: "TECK", nombre: "Teck Resources (Metales)" }
       ],
       "Real Estate / Bienes Raíces Top 10": [
-        { ticker: "PLD", nombre: "Prologis" },
+        { ticker: "PLD", nombre: "Prologis (Logística)" },
         { ticker: "AMT", nombre: "American Tower" },
-        { ticker: "EQIX", nombre: "Equinix" },
+        { ticker: "EQIX", nombre: "Equinix (Data Centers)" },
         { ticker: "PSA", nombre: "Public Storage" },
-        { ticker: "O", nombre: "Realty Income" },
+        { ticker: "O", nombre: "Realty Income (Dividendos)" },
         { ticker: "SPG", nombre: "Simon Property Group" },
-        { ticker: "WELL", nombre: "Welltower" },
+        { ticker: "WELL", nombre: "Welltower (Salud)" },
         { ticker: "DLR", nombre: "Digital Realty" },
         { ticker: "CCI", nombre: "Crown Castle" },
         { ticker: "CBRE", nombre: "CBRE Group" }
@@ -518,29 +519,29 @@
         { ticker: "KO", nombre: "Coca-Cola" },
         { ticker: "PEP", nombre: "PepsiCo" },
         { ticker: "PG", nombre: "Procter & Gamble" },
-        { ticker: "MDLZ", nombre: "Mondelez" },
+        { ticker: "MDLZ", nombre: "Mondelez International" },
         { ticker: "PM", nombre: "Philip Morris" },
         { ticker: "MO", nombre: "Altria Group" },
         { ticker: "CL", nombre: "Colgate-Palmolive" },
         { ticker: "KMB", nombre: "Kimberly-Clark" },
-        { ticker: "HSY", nombre: "The Hershey Co." },
+        { ticker: "HSY", nombre: "The Hershey Company" },
         { ticker: "GIS", nombre: "General Mills" }
       ],
       "Sector Automotriz Top 10": [
-        { ticker: "TSLA", nombre: "Tesla" },
-        { ticker: "TM", nombre: "Toyota Motor" },
-        { ticker: "F", nombre: "Ford" },
+        { ticker: "TM", nombre: "Toyota Motor Corp." },
+        { ticker: "F", nombre: "Ford Motor Company" },
         { ticker: "GM", nombre: "General Motors" },
-        { ticker: "STLA", nombre: "Stellantis" },
-        { ticker: "HMC", nombre: "Honda Motor" },
-        { ticker: "RACE", nombre: "Ferrari" },
+        { ticker: "STLA", nombre: "Stellantis (Fiat/Peugeot/Jeep)" },
+        { ticker: "HMC", nombre: "Honda Motor Co." },
+        { ticker: "RACE", nombre: "Ferrari N.V." },
         { ticker: "MBGYY", nombre: "Mercedes-Benz Group" },
         { ticker: "VWAGY", nombre: "Volkswagen Group" },
-        { ticker: "RIVN", nombre: "Rivian" }
+        { ticker: "RIVN", nombre: "Rivian Automotive" },
+        { ticker: "NIO", nombre: "NIO Inc. (Eléctricos)" }
       ]
     };
 
-
+    
     let cacheHistorialJSON = {};
     let precioDolarRef = 1200;
     let usuarioActual = null;
