@@ -68,7 +68,7 @@
     </div>
   </div>
 
-  <!-- SCRIPT AISLADO PARA CONTROL DE VISTAS -->
+  <!-- SCRIPT AISLADO PARA CONTROL DE VISTAS DE AUTENTICACIÓN -->
   <script>
     var modoAuth = "login";
 
@@ -256,6 +256,9 @@
       <button onclick="cambiarSolapa('portfolio')" id="tab-btn-portfolio" class="px-4 py-2.5 text-xs sm:text-sm font-bold border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition-colors whitespace-nowrap cursor-pointer">
         3. Mi Patrimonio & Distribución
       </button>
+      <button onclick="cambiarSolapa('noticias')" id="tab-btn-noticias" class="px-4 py-2.5 text-xs sm:text-sm font-bold border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition-colors whitespace-nowrap cursor-pointer">
+        4. Noticias del Mercado
+      </button>
     </nav>
 
     <!-- SOLAPA 1: MERCADO GENERAL -->
@@ -421,6 +424,24 @@
         <div id="contenedor-posiciones-portfolio" class="p-4 space-y-4"></div>
       </section>
     </main>
+
+    <!-- SOLAPA 4: NOTICIAS DEL MERCADO -->
+    <main id="solapa-noticias" class="hidden space-y-4">
+      <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 flex justify-between items-center">
+        <div>
+          <h2 class="text-sm font-bold text-amber-400">Noticias Financieras & Empresas</h2>
+          <p class="text-xs text-slate-500">Última actualidad de mercados, bonos, acciones y finanzas locales e internacionales</p>
+        </div>
+        <button onclick="cargarNoticias(true)" class="bg-slate-950 border border-slate-800 hover:border-amber-400/50 text-xs px-3 py-1.5 rounded-lg text-slate-300 font-semibold cursor-pointer">
+          ↻ Actualizar
+        </button>
+      </div>
+
+      <div id="grid-noticias" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div class="col-span-full py-12 text-center text-slate-500 font-mono text-xs">Cargando principales titulares...</div>
+      </div>
+    </main>
+
   </div>
 
   <script>
@@ -431,7 +452,7 @@
     const SUPABASE_ANON_KEY = "sb_publishable_xjtgreMTwxjySCTk8eT8sA_RRDIxIVj"; // Tu clave pública sb_publishable_...
     const API_KEY = "224011768fed4370b5bb6e19de465c98"; // Twelve Data
 
-    // ESTRUCTURA COMPLETA DE ACTIVOS POR SECTOR
+    // ESTRUCTURA COMPLETA DE 80 ACTIVOS 100% COMPATIBLES
     const LISTA_ACTIVOS = {
       "Commodities, Cripto & Divisas": [
         { ticker: "BTC/USD", nombre: "Bitcoin" },
@@ -541,11 +562,11 @@
       ]
     };
 
-    
     let cacheHistorialJSON = {};
     let precioDolarRef = 1200;
     let usuarioActual = null;
     let perfilDatos = { favoritos: [], compras: {}, tenencias_ars: { plazoFijo: 0, plazoFijoUVA: 0, efectivoARS: 0 }, alertas: {} };
+    let noticiasCargadas = false;
 
     let chartHistorialInstance = null;
     let chartPatrimonioInstance = null;
@@ -618,7 +639,7 @@
           if (!res.ok) throw new Error(data.error_description || data.msg || data.message || "Error al registrarse.");
 
           if (data.identities && data.identities.length === 0) {
-            setAuthMsg("Este correo ya está registrado. Toca abajo en '¿Ya tienes cuenta? Inicia sesión'.");
+            setAuthMsg("Este correo ya está registrado. Inicia sesión directamente.");
             return;
           }
 
@@ -690,7 +711,7 @@
     }
 
     // =========================================================
-    // 3. PERSISTENCIA EN SUPABASE CON REST API NATIVA
+    // 3. PERSISTENCIA EN SUPABASE
     // =========================================================
     async function cargarDatosDesdeNube() {
       if (!usuarioActual) return;
@@ -754,16 +775,18 @@
     }
 
     // =========================================================
-    // 4. NAVEGACIÓN Y MERCADO
+    // 4. NAVEGACIÓN Y SOLAPAS
     // =========================================================
     function cambiarSolapa(solapa) {
       document.getElementById("solapa-mercado").classList.add("hidden");
       document.getElementById("solapa-historial").classList.add("hidden");
       document.getElementById("solapa-portfolio").classList.add("hidden");
+      document.getElementById("solapa-noticias").classList.add("hidden");
 
       document.getElementById("tab-btn-mercado").className = "px-4 py-2.5 text-xs sm:text-sm font-bold border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition-colors whitespace-nowrap cursor-pointer";
       document.getElementById("tab-btn-historial").className = "px-4 py-2.5 text-xs sm:text-sm font-bold border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition-colors whitespace-nowrap cursor-pointer";
       document.getElementById("tab-btn-portfolio").className = "px-4 py-2.5 text-xs sm:text-sm font-bold border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition-colors whitespace-nowrap cursor-pointer";
+      document.getElementById("tab-btn-noticias").className = "px-4 py-2.5 text-xs sm:text-sm font-bold border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition-colors whitespace-nowrap cursor-pointer";
 
       if (solapa === 'mercado') {
         document.getElementById("solapa-mercado").classList.remove("hidden");
@@ -776,6 +799,10 @@
         document.getElementById("solapa-portfolio").classList.remove("hidden");
         document.getElementById("tab-btn-portfolio").className = "px-4 py-2.5 text-xs sm:text-sm font-bold border-b-2 border-amber-400 text-amber-400 transition-colors whitespace-nowrap cursor-pointer";
         renderizarPortfolioDetallado();
+      } else if (solapa === 'noticias') {
+        document.getElementById("solapa-noticias").classList.remove("hidden");
+        document.getElementById("tab-btn-noticias").className = "px-4 py-2.5 text-xs sm:text-sm font-bold border-b-2 border-amber-400 text-amber-400 transition-colors whitespace-nowrap cursor-pointer";
+        cargarNoticias();
       }
     }
 
@@ -811,7 +838,9 @@
       reader.readAsText(file);
     }
 
-    // PRECARGA INTELIGENTE DE DATOS SIN CACHÉ
+    // =========================================================
+    // 5. PRECARGA INMEDIATA Y RENDER DE PRECIOS
+    // =========================================================
     async function precargarDatosArchivados() {
       const antiCache = `?t=${Date.now()}`;
       try {
@@ -820,7 +849,12 @@
           const precios = await resP.json();
           for (const [t, p] of Object.entries(precios)) {
             localStorage.setItem(`cache_${t}`, p);
+            const el = document.getElementById(`price-${limpiarId(t)}`);
+            if (el) el.innerHTML = formatearPrecioDual(p, t);
           }
+          renderizarFavoritos();
+          actualizarPanelPortfolio();
+          verificarAlertas();
         }
       } catch (e) {
         console.warn("precios.json aún no generado o no accesible.");
@@ -998,6 +1032,9 @@
       });
     }
 
+    // =========================================================
+    // 6. HISTORIAL GRÁFICO (SOLAPA 2)
+    // =========================================================
     function renderizarHistorialCompleto() {
       const ticker = document.getElementById("select-historial-ticker").value;
       const todos = Object.values(LISTA_ACTIVOS).flat();
@@ -1091,6 +1128,9 @@
       });
     }
 
+    // =========================================================
+    // 7. ALERTAS Y METAS
+    // =========================================================
     function abrirModalAlerta(ticker) {
       document.getElementById("alerta-ticker").value = ticker;
       document.getElementById("modal-alerta-titulo").textContent = `Meta: ${ticker}`;
@@ -1151,6 +1191,9 @@
       else banner.classList.add("hidden");
     }
 
+    // =========================================================
+    // 8. PATRIMONIO, TENENCIAS ARS & OPERACIONES (SOLAPA 3)
+    // =========================================================
     function abrirModalTenenciaARS(tipo, titulo) {
       document.getElementById("tenencia-ars-tipo").value = tipo;
       document.getElementById("modal-tenencia-titulo").textContent = `Ajustar ${titulo}`;
@@ -1417,7 +1460,70 @@
       });
     }
 
-    // ROTACIÓN DE LOTES DE 8 ACTIVOS (Respeta límite de Twelve Data)
+    // =========================================================
+    // 9. SOLAPA 4: NOTICIAS DEL MERCADO
+    // =========================================================
+    async function cargarNoticias(forzar = false) {
+      if (noticiasCargadas && !forzar) return;
+      const cont = document.getElementById("grid-noticias");
+      cont.innerHTML = `<div class="col-span-full py-12 text-center text-slate-500 font-mono text-xs">Consultando fuentes de noticias financieras...</div>`;
+
+      // RSS público filtrado por finanzas, mercados y empresas argentinas y globales
+      const feedUrl = encodeURIComponent("https://news.google.com/rss/search?q=finanzas+empresas+acciones+argentina+mercados&hl=es-419&gl=AR&ceid=AR:es-419");
+
+      try {
+        const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${feedUrl}`);
+        const data = await res.json();
+
+        if (data.status === "ok" && data.items && data.items.length > 0) {
+          cont.innerHTML = "";
+          noticiasCargadas = true;
+
+          data.items.slice(0, 12).forEach(item => {
+            const fecha = new Date(item.pubDate).toLocaleDateString('es-AR', {
+              day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'
+            });
+
+            const resumenLimpio = item.description ? item.description.replace(/<[^>]*>?/gm, '').slice(0, 140) + "..." : "Toca para leer el artículo completo.";
+            const medio = item.author || "Mercados / Finanzas";
+
+            const card = document.createElement("a");
+            card.href = item.link;
+            card.target = "_blank";
+            card.rel = "noopener noreferrer";
+            card.className = "bg-slate-900 border border-slate-800 hover:border-amber-400/40 rounded-xl p-4 flex flex-col justify-between transition-all hover:bg-slate-900/80 group cursor-pointer block";
+
+            card.innerHTML = `
+              <div>
+                <div class="flex justify-between items-center text-[10px] font-mono text-slate-500 mb-2">
+                  <span class="text-amber-400 font-bold uppercase tracking-wider">${medio}</span>
+                  <span>${fecha}</span>
+                </div>
+                <h3 class="text-xs sm:text-sm font-semibold text-slate-200 group-hover:text-amber-300 transition-colors leading-snug mb-2">
+                  ${item.title}
+                </h3>
+                <p class="text-[11px] text-slate-400 line-clamp-3 leading-relaxed mb-3">
+                  ${resumenLimpio}
+                </p>
+              </div>
+              <div class="pt-2 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-amber-400 font-bold">
+                <span>Leer nota completa</span>
+                <span class="transform group-hover:translate-x-1 transition-transform">→</span>
+              </div>
+            `;
+            cont.appendChild(card);
+          });
+        } else {
+          cont.innerHTML = `<div class="col-span-full py-12 text-center text-slate-500 text-xs">No se pudieron recuperar noticias en este momento.</div>`;
+        }
+      } catch (err) {
+        cont.innerHTML = `<div class="col-span-full py-12 text-center text-rose-400 text-xs">Error de conexión al cargar las noticias.</div>`;
+      }
+    }
+
+    // =========================================================
+    // 10. ROTACIÓN DE LOTES DE 8 ACTIVOS (Twelve Data)
+    // =========================================================
     let lotes = [];
     let indiceLote = 0;
     let tiempoRestante = 60;
@@ -1484,7 +1590,7 @@
     }
 
     // =========================================================
-    // 5. DETECCIÓN AUTOMÁTICA DEL ENLACE DE CONFIRMACIÓN O SESIÓN
+    // 11. DETECCIÓN AUTOMÁTICA DE SESIÓN
     // =========================================================
     window.addEventListener("DOMContentLoaded", async () => {
       const urlBase = SUPABASE_URL.trim().replace(/\/+$/, "");
