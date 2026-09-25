@@ -425,12 +425,12 @@
       </section>
     </main>
 
-    <!-- SOLAPA 4: NOTICIAS DEL MERCADO -->
+    <!-- SOLAPA 4: NOTICIAS DEL MERCADO (INFOBAE ECONOMÍA) -->
     <main id="solapa-noticias" class="hidden space-y-4">
       <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 flex justify-between items-center">
         <div>
           <h2 class="text-sm font-bold text-amber-400">Noticias Financieras & Empresas</h2>
-          <p class="text-xs text-slate-500">Última actualidad de mercados, bonos, acciones y finanzas locales e internacionales</p>
+          <p class="text-xs text-slate-500">Última actualidad de mercados, bonos, acciones y finanzas locales e internacionales (Acceso Libre)</p>
         </div>
         <button onclick="cargarNoticias(true)" class="bg-slate-950 border border-slate-800 hover:border-amber-400/50 text-xs px-3 py-1.5 rounded-lg text-slate-300 font-semibold cursor-pointer">
           ↻ Actualizar
@@ -863,9 +863,7 @@
       try {
         const resH = await fetch("historial.json" + antiCache, { cache: "no-store" });
         if (resH.ok) cacheHistorialJSON = await resH.json();
-      } catch (e) {
-        console.warn("historial.json aún no generado o no accesible.");
-      }
+      } catch (e) {}
     }
 
     async function actualizarReferenciasLocales() {
@@ -1461,15 +1459,15 @@
     }
 
     // =========================================================
-    // 9. SOLAPA 4: NOTICIAS DEL MERCADO
+    // 9. SOLAPA 4: NOTICIAS DEL MERCADO (INFOBAE ECONOMÍA - ACCESO LIBRE)
     // =========================================================
     async function cargarNoticias(forzar = false) {
       if (noticiasCargadas && !forzar) return;
       const cont = document.getElementById("grid-noticias");
-      cont.innerHTML = `<div class="col-span-full py-12 text-center text-slate-500 font-mono text-xs">Consultando fuentes de noticias financieras...</div>`;
+      cont.innerHTML = `<div class="col-span-full py-12 text-center text-slate-500 font-mono text-xs">Consultando fuentes de noticias financieras de acceso libre...</div>`;
 
-      // RSS público filtrado por finanzas, mercados y empresas argentinas y globales
-      const feedUrl = encodeURIComponent("https://news.google.com/rss/search?q=finanzas+empresas+acciones+argentina+mercados&hl=es-419&gl=AR&ceid=AR:es-419");
+      // RSS público y abierto de Infobae Economía (sin paywall ni muros de pago)
+      const feedUrl = encodeURIComponent("https://www.infobae.com/arc/outboundfeeds/rss/category/economia/?outputType=xml");
 
       try {
         const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${feedUrl}`);
@@ -1479,35 +1477,36 @@
           cont.innerHTML = "";
           noticiasCargadas = true;
 
-          data.items.slice(0, 12).forEach(item => {
+          data.items.slice(0, 15).forEach(item => {
             const fecha = new Date(item.pubDate).toLocaleDateString('es-AR', {
               day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'
             });
 
-            const resumenLimpio = item.description ? item.description.replace(/<[^>]*>?/gm, '').slice(0, 140) + "..." : "Toca para leer el artículo completo.";
-            const medio = item.author || "Mercados / Finanzas";
+            let resumen = item.description ? item.description.replace(/<[^>]*>?/gm, '').trim() : "";
+            if (resumen.length > 150) resumen = resumen.slice(0, 147) + "...";
+            if (!resumen) resumen = "Haz clic para acceder a la cobertura completa de este hecho económico.";
 
             const card = document.createElement("a");
             card.href = item.link;
             card.target = "_blank";
             card.rel = "noopener noreferrer";
-            card.className = "bg-slate-900 border border-slate-800 hover:border-amber-400/40 rounded-xl p-4 flex flex-col justify-between transition-all hover:bg-slate-900/80 group cursor-pointer block";
+            card.className = "bg-slate-900 border border-slate-800 hover:border-amber-400/50 rounded-xl p-4 flex flex-col justify-between transition-all hover:bg-slate-900/80 group cursor-pointer block";
 
             card.innerHTML = `
               <div>
                 <div class="flex justify-between items-center text-[10px] font-mono text-slate-500 mb-2">
-                  <span class="text-amber-400 font-bold uppercase tracking-wider">${medio}</span>
+                  <span class="text-amber-400 font-bold uppercase tracking-wider">Infobae Economía</span>
                   <span>${fecha}</span>
                 </div>
                 <h3 class="text-xs sm:text-sm font-semibold text-slate-200 group-hover:text-amber-300 transition-colors leading-snug mb-2">
                   ${item.title}
                 </h3>
-                <p class="text-[11px] text-slate-400 line-clamp-3 leading-relaxed mb-3">
-                  ${resumenLimpio}
+                <p class="text-[11px] text-slate-400 leading-relaxed mb-3">
+                  ${resumen}
                 </p>
               </div>
               <div class="pt-2 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-amber-400 font-bold">
-                <span>Leer nota completa</span>
+                <span>Leer nota completa (Sin suscripción)</span>
                 <span class="transform group-hover:translate-x-1 transition-transform">→</span>
               </div>
             `;
@@ -1517,7 +1516,7 @@
           cont.innerHTML = `<div class="col-span-full py-12 text-center text-slate-500 text-xs">No se pudieron recuperar noticias en este momento.</div>`;
         }
       } catch (err) {
-        cont.innerHTML = `<div class="col-span-full py-12 text-center text-rose-400 text-xs">Error de conexión al cargar las noticias.</div>`;
+        cont.innerHTML = `<div class="col-span-full py-12 text-center text-rose-400 text-xs">Error de conexión al cargar el feed de noticias abiertas.</div>`;
       }
     }
 
